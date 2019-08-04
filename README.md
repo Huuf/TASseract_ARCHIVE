@@ -16,6 +16,16 @@ DwangoAC for introducing me to this community
 
 The [TASBot](http://discord.tas.bot) community
 
+# Setting up build environments + building
+
+## Windows
+### Setting Up
+1. Install the GNU arm toolchain from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) - latest version that ends with -sha2.exe (add path to environment variable, default unchecked, version at the time of writing is `gcc-arm-none-eabi-8-2019-q3-update-win32-sha2.exe`)
+2. Install Make for Windows from [here](http://gnuwin32.sourceforge.net/packages/make.htm), download the setup file (Complete package, except sources)
+### Building
+1. Go into the src directory
+2. Run `make` from this directory (Default path is `C:\Program Files (x86)\GnuWin32\bin`, doesn't get added to path by default, and if you have multiple build enviornments, it's not recommended to do so).
+
 # PCB
 The PCB is made in the free software [CircuitMaker](https://circuitmaker.com/) and can be found here: [Development PCB](https://circuitmaker.com/Projects/Details/Hans-Anders-3/TAStm32H745ZIT6).
 
