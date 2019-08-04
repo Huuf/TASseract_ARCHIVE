@@ -1,0 +1,3 @@
+
+$(OUT_DIR):
+	mkdir $@
