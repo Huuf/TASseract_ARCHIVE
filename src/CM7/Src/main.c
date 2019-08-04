@@ -34,7 +34,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
- 
+
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 
 /* USER CODE END PD */
@@ -83,9 +83,9 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
-   
+
   /* USER CODE BEGIN Boot_Mode_Sequence_0 */
-    int32_t timeout; 
+    int32_t timeout;
   /* USER CODE END Boot_Mode_Sequence_0 */
 
 /* USER CODE BEGIN Boot_Mode_Sequence_1 */
@@ -162,15 +162,15 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
   RCC_PeriphCLKInitTypeDef PeriphClkInitStruct = {0};
 
-  /** Supply configuration update enable 
+  /** Supply configuration update enable
   */
   HAL_PWREx_ConfigSupply(PWR_LDO_SUPPLY);
-  /** Configure the main internal regulator output voltage 
+  /** Configure the main internal regulator output voltage
   */
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_DIV1;
@@ -190,7 +190,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Initializes the CPU, AHB and APB busses clocks 
+  /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
@@ -219,7 +219,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  /** Enable USB Voltage detector 
+  /** Enable USB Voltage detector
   */
   HAL_PWREx_EnableUSBVoltageDetector();
 }
@@ -252,13 +252,13 @@ static void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
-  /** Configure Analogue filter 
+  /** Configure Analogue filter
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
-  /** Configure Digital filter 
+  /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
@@ -446,7 +446,7 @@ void Error_Handler(void)
   * @retval None
   */
 void assert_failed(uint8_t *file, uint32_t line)
-{ 
+{
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
      tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
