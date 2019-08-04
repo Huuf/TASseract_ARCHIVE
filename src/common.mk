@@ -77,6 +77,7 @@ C_SOURCES_CM7 =  \
 $(C_SOURCES_COMMON) \
 CM7/Src/main.c \
 CM7/Src/usb_device.c \
+CM7/Src/ra8875.c \
 CM7/Src/usbd_conf.c \
 CM7/Src/usbd_desc.c \
 CM7/Src/usbd_cdc_if.c \
