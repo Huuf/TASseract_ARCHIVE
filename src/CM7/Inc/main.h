@@ -72,8 +72,6 @@ void Error_Handler(void);
 #define DISP_RST_GPIO_Port GPIOC
 #define DISP_INT_Pin GPIO_PIN_1
 #define DISP_INT_GPIO_Port GPIOC
-#define SNES_RESET_Pin GPIO_PIN_13
-#define SNES_RESET_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
