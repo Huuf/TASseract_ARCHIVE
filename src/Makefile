@@ -69,7 +69,8 @@ Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c \
 Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c \
+Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c
 
 C_SOURCES_CM4 =  \
 $(C_SOURCES_COMMON) \
@@ -204,6 +205,17 @@ LIBDIR =
 LDFLAGS_CM4 = $(MCU_CM4) -specs=nano.specs -T$(LDSCRIPT_CM4) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR_CM4)/$(TARGET_CM4).map,--cref -Wl,--gc-sections
 LDFLAGS_CM7 = $(MCU_CM7) -specs=nano.specs -T$(LDSCRIPT_CM7) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR_CM7)/$(TARGET_CM7).map,--cref -Wl,--gc-sections
 
+# list of objects
+OBJECTS_CM4 = $(addprefix $(BUILD_DIR_CM4)/,$(notdir $(C_SOURCES_CM4:.c=.o)))
+vpath %.c $(sort $(dir $(C_SOURCES_CM4)))
+OBJECTS_CM7 = $(addprefix $(BUILD_DIR_CM7)/,$(notdir $(C_SOURCES_CM7:.c=.o)))
+vpath %.c $(sort $(dir $(C_SOURCES_CM7)))
+# list of ASM program objects
+OBJECTS_CM4 += $(addprefix $(BUILD_DIR_CM4)/,$(notdir $(ASM_SOURCES_CM4:.s=.o)))
+vpath %.s $(sort $(dir $(ASM_SOURCES_CM4)))
+OBJECTS_CM7 += $(addprefix $(BUILD_DIR_CM7)/,$(notdir $(ASM_SOURCES_CM7:.s=.o)))
+vpath %.s $(sort $(dir $(ASM_SOURCES_CM7)))
+
 # default action: build all
 all: all_cm4 all_cm7
 
@@ -239,16 +251,6 @@ endif
 #######################################
 # build the application
 #######################################
-# list of objects
-OBJECTS_CM4 = $(addprefix $(BUILD_DIR_CM4)/,$(notdir $(C_SOURCES_CM4:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES_CM4)))
-OBJECTS_CM7 = $(addprefix $(BUILD_DIR_CM7)/,$(notdir $(C_SOURCES_CM7:.c=.o)))
-vpath %.c $(sort $(dir $(C_SOURCES_CM7)))
-# list of ASM program objects
-OBJECTS_CM4 += $(addprefix $(BUILD_DIR_CM4)/,$(notdir $(ASM_SOURCES_CM4:.s=.o)))
-vpath %.s $(sort $(dir $(ASM_SOURCES_CM4)))
-OBJECTS_CM7 += $(addprefix $(BUILD_DIR_CM7)/,$(notdir $(ASM_SOURCES_CM7:.s=.o)))
-vpath %.s $(sort $(dir $(ASM_SOURCES_CM7)))
 
 $(BUILD_DIR_CM4)/%.o: %.c Makefile | $(BUILD_DIR_CM4) 
 	$(CC) -c $(CFLAGS_CM4) $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR_CM4)/$(notdir $(<:.c=.lst)) $< -o $@
@@ -304,7 +306,7 @@ clean: clean_cm4 clean_cm7
 #######################################
 # dependencies
 #######################################
--include $(wildcard $(BUILD_DIR_CM4)/*.d)
--include $(wildcard $(BUILD_DIR_CM7)/*.d)
+#-include $(wildcard $(BUILD_DIR_CM4)/*.d)
+#-include $(wildcard $(BUILD_DIR_CM7)/*.d)
 
 # *** EOF ***

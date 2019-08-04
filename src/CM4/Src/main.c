@@ -116,11 +116,11 @@ int main(void)
 	/* USER CODE END 3 */
 }
 
--/**
--  * @brief GPIO Initialization Function
--  * @param None
--  * @retval None
--  */
+/**
+  * @brief GPIO Initialization Function
+  * @param None
+  * @retval None
+  */
 static void MX_GPIO_Init(void)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
