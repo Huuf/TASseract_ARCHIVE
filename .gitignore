@@ -1,0 +1,4 @@
+#ignore compiled files
+src/build_cm4/
+src/build_cm7/
+src/out/
