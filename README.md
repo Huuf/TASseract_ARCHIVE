@@ -33,7 +33,9 @@ The PCB is made in the free software [CircuitMaker](https://circuitmaker.com/) a
 The case is made in the free for certain parties software [Fusion 360](http://fusion360.autodesk.com) and can be found here: [Development case](https://a360.co/2Kgfb6K).
 
 # Source Code
-Not here yet.
+This project is written in C with some ASM.
+
+The source code is available in the src directory. In here you will find code generated using [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and then modified according to the needs of the project.
 
 # Duh
 If I had a Duh moment (forgot credits, stuff like that), you can contact me on [Discord](http://discord.tas.bot) and @Skippy#5840
