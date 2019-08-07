@@ -73,7 +73,7 @@ void Error_Handler(void);
 #define DISP_INT_Pin GPIO_PIN_1
 #define DISP_INT_GPIO_Port GPIOC
 /* USER CODE BEGIN Private defines */
-
+void jumpToDFU(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

@@ -80,76 +80,80 @@ static void MX_USART1_UART_Init(void);
   */
 int main(void)
 {
-  /* USER CODE BEGIN 1 */
+	/* USER CODE BEGIN 1 */
+	/* If we booted from a software reset, we want to force DFU mode. */
+	if(RCC->RSR & RCC_RSR_SFT1RSTF)
+	{
+		jumpToDFU();
+	}
+	/* USER CODE END 1 */
 
-  /* USER CODE END 1 */
+	/* USER CODE BEGIN Boot_Mode_Sequence_0 */
+	int32_t timeout;
+	/* USER CODE END Boot_Mode_Sequence_0 */
 
-  /* USER CODE BEGIN Boot_Mode_Sequence_0 */
-    int32_t timeout;
-  /* USER CODE END Boot_Mode_Sequence_0 */
+	/* USER CODE BEGIN Boot_Mode_Sequence_1 */
+	/* Wait until CPU2 boots and enters in stop mode or timeout*/
+	timeout = 0xFFFF;
+	while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
+	if ( timeout < 0 )
+	{
+		Error_Handler();
+	}
+	/* USER CODE END Boot_Mode_Sequence_1 */
+	/* MCU Configuration--------------------------------------------------------*/
 
-/* USER CODE BEGIN Boot_Mode_Sequence_1 */
-  /* Wait until CPU2 boots and enters in stop mode or timeout*/
-  timeout = 0xFFFF;
-  while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
-  if ( timeout < 0 )
-  {
-  Error_Handler();
-  }
-/* USER CODE END Boot_Mode_Sequence_1 */
-  /* MCU Configuration--------------------------------------------------------*/
+	/* Reset of all peripherals, Initializes the Flash interface and the Systick. */
+	HAL_Init();
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+	/* USER CODE BEGIN Init */
 
-  /* USER CODE BEGIN Init */
+	/* USER CODE END Init */
 
-  /* USER CODE END Init */
+	/* Configure the system clock */
+	SystemClock_Config();
+	/* USER CODE BEGIN Boot_Mode_Sequence_2 */
+	/* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
+	HSEM notification */
+	/*HW semaphore Clock enable*/
+	__HAL_RCC_HSEM_CLK_ENABLE();
+	/*Take HSEM */
+	HAL_HSEM_FastTake(HSEM_ID_0);
+	/*Release HSEM in order to notify the CPU2(CM4)*/
+	HAL_HSEM_Release(HSEM_ID_0,0);
+	/* wait until CPU2 wakes up from stop mode */
+	timeout = 0xFFFF;
+	while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
+	if ( timeout < 0 )
+	{
+		Error_Handler();
+	}
+	/* USER CODE END Boot_Mode_Sequence_2 */
 
-  /* Configure the system clock */
-  SystemClock_Config();
-/* USER CODE BEGIN Boot_Mode_Sequence_2 */
-/* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
-HSEM notification */
-/*HW semaphore Clock enable*/
-__HAL_RCC_HSEM_CLK_ENABLE();
-/*Take HSEM */
-HAL_HSEM_FastTake(HSEM_ID_0);
-/*Release HSEM in order to notify the CPU2(CM4)*/
-HAL_HSEM_Release(HSEM_ID_0,0);
-/* wait until CPU2 wakes up from stop mode */
-timeout = 0xFFFF;
-while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
-if ( timeout < 0 )
-{
-Error_Handler();
-}
-/* USER CODE END Boot_Mode_Sequence_2 */
+	/* USER CODE BEGIN SysInit */
 
-  /* USER CODE BEGIN SysInit */
+	/* USER CODE END SysInit */
 
-  /* USER CODE END SysInit */
+	/* Initialize all configured peripherals */
+	MX_GPIO_Init();
+	MX_I2C2_Init();
+	MX_SDMMC1_SD_Init();
+	MX_SPI6_Init();
+	MX_USART1_UART_Init();
+	MX_USB_DEVICE_Init();
+	/* USER CODE BEGIN 2 */
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_I2C2_Init();
-  MX_SDMMC1_SD_Init();
-  MX_SPI6_Init();
-  MX_USART1_UART_Init();
-  MX_USB_DEVICE_Init();
-  /* USER CODE BEGIN 2 */
+	/* USER CODE END 2 */
 
-  /* USER CODE END 2 */
+	/* Infinite loop */
+	/* USER CODE BEGIN WHILE */
+	while (1)
+	{
+		/* USER CODE END WHILE */
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
-  {
-    /* USER CODE END WHILE */
-
-    /* USER CODE BEGIN 3 */
-  }
-  /* USER CODE END 3 */
+		/* USER CODE BEGIN 3 */
+	}
+	/* USER CODE END 3 */
 }
 
 /**
@@ -422,7 +426,27 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+// Many thanks to Tien Majerle, owner of https://stm32f4-discovery.net/, for help with this function
+void jumpToDFU(void)
+{
+	void (*SysMemBootJump)(void);
 
+	volatile uint32_t addr = 0x1FF09800; // address of rom base
+
+	// clear SysTick
+	SysTick->CTRL = 0;
+	SysTick->LOAD = 0;
+	SysTick->VAL = 0;
+
+	// sets destination address of the jump. note it is one word into the bootloader code which is the first instruction
+	SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
+
+	// sets the stack pointer to the first word of the bootloader code
+	__set_MSP(*(uint32_t *)addr);
+
+	// jump!
+	SysMemBootJump();
+}
 /* USER CODE END 4 */
 
 /**
