@@ -285,7 +285,7 @@ ra8875_result ra8875_init_lcd(struct ra8875_state *state)
 	//Clear screen
 	check_result(ra8875_set_register(state, REG_MCLR, 0x80));
 
-	Delay1ms(100);
+	//Delay1ms(100);
 
 exit_function:
 	return rv;
