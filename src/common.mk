@@ -70,7 +70,8 @@ C_SOURCES_CM4 =  \
 $(C_SOURCES_COMMON) \
 CM4/Src/main.c \
 CM4/Src/stm32h7xx_it.c \
-CM4/Src/stm32h7xx_hal_msp.c
+CM4/Src/stm32h7xx_hal_msp.c \
+CM4/Src/n64_gc.c
 
 
 C_SOURCES_CM7 =  \
