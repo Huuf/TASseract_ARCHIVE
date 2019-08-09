@@ -3,11 +3,7 @@
 #include "n64_gc.h"
 #include "stm32h7xx_hal.h"
 
-//TODO: REPLACE WITH PROPER SLEEP FUNCTION
-void my_wait_us_asm(int n)
-{
-
-}
+void sleep_us_cm4(int numSeconds);
 
 // TODO: REPLACE WITH CORRECT DATA PIN REGISTER AND MASK
 #define N64_READ (GPIOC->IDR & 0x0010)
@@ -18,7 +14,7 @@ uint32_t readCommand()
 
 	// we are already at the first falling edge
 	// get middle of first pulse, 2us later
-	my_wait_us_asm(2);
+	sleep_us_cm4(2);
 	uint32_t command = N64_READ ? 1U : 0U, bits_read = 1;
 
     while(1) // read at least 9 bits (1 byte + stop bit)
@@ -77,7 +73,7 @@ uint8_t GetMiddleOfPulse()
     // now we have the falling edge
 
     // wait 2 microseconds to be in the middle of the pulse, and read. high --> 1.  low --> 0.
-    my_wait_us_asm(2);
+    sleep_us_cm4(2);
 
     return N64_READ ? 1U : 0U;
 }
@@ -86,7 +82,7 @@ uint8_t GetMiddleOfPulse()
 void SendStop()
 {
 	GPIOC->BSRR = (1 << 20);
-	my_wait_us_asm(1);
+	sleep_us_cm4(1);
 	GPIOC->BSRR = (1 << 4);
 }
 
@@ -103,18 +99,18 @@ void SendIdentityN64()
 void write_1()
 {
 	GPIOC->BSRR = (1 << 20);
-	my_wait_us_asm(1);
+	sleep_us_cm4(1);
 	GPIOC->BSRR = (1 << 4);
-    my_wait_us_asm(3);
+    sleep_us_cm4(3);
 }
 
 // TODO: REPLACE WITH CORRECT DATA PIN REGISTER AND MASK
 void write_0()
 {
 	GPIOC->BSRR = (1 << 20);
-	my_wait_us_asm(3);
+	sleep_us_cm4(3);
 	GPIOC->BSRR = (1 << 4);
-    my_wait_us_asm(1);
+    sleep_us_cm4(1);
 }
 
 // send a byte from LSB to MSB (proper serialization)
