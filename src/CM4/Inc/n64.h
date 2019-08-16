@@ -14,8 +14,7 @@ void n64_vsync(struct n64 *n64);
 void n64_hsync(struct n64 *n64);
 void n64_destroy(struct n64 **n64_ptr);
 
-void n64_process_serial_protocol_insert_name_here(struct n64 *n64, uint8_t *data, size_t size);
-void n64_process_bk2_frame(struct n64 *n64, uint8_t *data, size_t size);
+void n64_process_data(struct n64 *n64, uint8_t *data, size_t size);
 
 #ifdef __cplusplus
 }

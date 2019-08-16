@@ -20,6 +20,5 @@ struct n64_controller {
 	GPIO_TypeDef *VCC_PORT;
 	uint16_t      VCC_PIN;
 
-	bool is_four_score;
 	uint32_t bit_pos;
 };
