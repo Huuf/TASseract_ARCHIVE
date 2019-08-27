@@ -227,7 +227,13 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
     break;
 
     case CDC_GET_LINE_CODING:
-
+		pbuf[0] = (uint8_t)BAUD_RATE;
+		pbuf[1] = (uint8_t)(BAUD_RATE >> 8);
+		pbuf[2] = (uint8_t)(BAUD_RATE >> 16);
+		pbuf[3] = (uint8_t)(BAUD_RATE >> 24);
+		pbuf[4] = CHAR_FORMAT;
+		pbuf[5] = PARITY_TYPE;
+		pbuf[6] = NUMBER_DATA_BITS;
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:

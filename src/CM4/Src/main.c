@@ -112,6 +112,10 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		GPIOA->BSRR = GPIO_PIN_13;
+		HAL_Delay(1000);
+		GPIOA->BSRR = (GPIO_PIN_13 << 16);
+		HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
 }

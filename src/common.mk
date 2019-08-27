@@ -114,13 +114,13 @@ CP = $(PREFIX)objcopy
 SZ = $(PREFIX)size
 endif
 HEX = $(CP) -O ihex
-BIN = $(CP) -O binary -S
+BIN = $(CP) -O binary
  
 #######################################
 # CFLAGS
 #######################################
 # cpu
-CPU_CM4 = -mcpu=cortex-m4
+CPU_CM4 = -mcpu=cortex-m7 # looks wrong but is right
 CPU_CM7 = -mcpu=cortex-m7
 
 # fpu
@@ -149,7 +149,8 @@ $(C_DEFS_COMMON) \
 
 C_DEFS_CM7 = \
 $(C_DEFS_COMMON) \
--DCORE_CM7
+-DCORE_CM7 \
+-DUSE_USB_FS
 
 
 # AS includes

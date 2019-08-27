@@ -136,11 +136,14 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	MX_I2C2_Init();
-	MX_SDMMC1_SD_Init();
-	MX_SPI6_Init();
-	MX_USART1_UART_Init();
-	MX_USB_DEVICE_Init();
+
+	//TODO: ONE OR MORE OF THESE HANG
+	//MX_I2C2_Init();
+	//MX_SDMMC1_SD_Init();
+	//MX_SPI6_Init();
+	//MX_USART1_UART_Init();
+
+	//MX_USB_DEVICE_Init(); // HANGS
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -152,6 +155,18 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+
+		// GPIO TESTING: WORKS
+		GPIOC->BSRR = DISP_RST_Pin; // set it high
+		HAL_Delay(1000);
+		GPIOC->BSRR = (DISP_RST_Pin << 16); // set it low
+		HAL_Delay(1000);
+
+		// software reset code: WORKS
+		//HAL_Delay(5000);
+		/*SCB->AIRCR  = (0x5FA << 16) | (SCB->AIRCR & (0x700)) | (1<<2);
+		__DSB();
+		while(1);*/
 	}
 	/* USER CODE END 3 */
 }
@@ -408,35 +423,59 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
 
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-  __HAL_RCC_GPIOC_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
+	/* GPIO Ports Clock Enable */
+	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOG_CLK_ENABLE();
 
-  /*Configure GPIO pin : PA2 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	HAL_GPIO_WritePin(GPIOC, DISP_RST_Pin, GPIO_PIN_SET);
 
+	/*Configure GPIO pin : PA2 */
+	GPIO_InitStruct.Pin = GPIO_PIN_2;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	GPIO_InitStruct.Pin = DISP_RST_Pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 4 */
-// Many thanks to Tien Majerle, owner of https://stm32f4-discovery.net/, for help with this function
+// Source: https://community.st.com/s/article/STM32H7-bootloader-jump-from-application
 void jumpToDFU(void)
 {
+	uint32_t i=0;
 	void (*SysMemBootJump)(void);
 
 	volatile uint32_t addr = 0x1FF09800; // address of rom base
+
+	/* Disable all interrupts */
+    __disable_irq();
 
 	// clear SysTick
 	SysTick->CTRL = 0;
 	SysTick->LOAD = 0;
 	SysTick->VAL = 0;
+
+	/* Set the clock to the default state */
+    HAL_RCC_DeInit();
+
+    /* Clear Interrupt Enable Register & Interrupt Pending Register */
+    for (i=0;i<5;i++)
+    {
+		NVIC->ICER[i]=0xFFFFFFFF;
+		NVIC->ICPR[i]=0xFFFFFFFF;
+    }
+
+	/* Re-enable all interrupts */
+	__enable_irq();
 
 	// sets destination address of the jump. note it is one word into the bootloader code which is the first instruction
 	SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
