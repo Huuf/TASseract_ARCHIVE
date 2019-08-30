@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "stm32h7xx_hal_flash_ex.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -82,24 +83,24 @@ int main(void)
 {
 	/* USER CODE BEGIN 1 */
 	/* If we booted from a software reset, we want to force DFU mode. */
-	if(RCC->RSR & RCC_RSR_SFT1RSTF)
-	{
-		jumpToDFU();
-	}
+	//if(RCC->RSR & RCC_RSR_SFT1RSTF)
+	//{
+	//	jumpToDFU();
+	//}
 	/* USER CODE END 1 */
 
 	/* USER CODE BEGIN Boot_Mode_Sequence_0 */
-	int32_t timeout;
+	//int32_t timeout;
 	/* USER CODE END Boot_Mode_Sequence_0 */
 
 	/* USER CODE BEGIN Boot_Mode_Sequence_1 */
 	/* Wait until CPU2 boots and enters in stop mode or timeout*/
-	timeout = 0xFFFF;
-	while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
-	if ( timeout < 0 )
-	{
-		Error_Handler();
-	}
+	//timeout = 0xFFFF;
+	//while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) != RESET) && (timeout-- > 0));
+	//if ( timeout < 0 )
+	//{
+		//Error_Handler();
+	//}
 	/* USER CODE END Boot_Mode_Sequence_1 */
 	/* MCU Configuration--------------------------------------------------------*/
 
@@ -116,18 +117,18 @@ int main(void)
 	/* When system initialization is finished, Cortex-M7 will release Cortex-M4 by means of
 	HSEM notification */
 	/*HW semaphore Clock enable*/
-	__HAL_RCC_HSEM_CLK_ENABLE();
+	//__HAL_RCC_HSEM_CLK_ENABLE();
 	/*Take HSEM */
-	HAL_HSEM_FastTake(HSEM_ID_0);
+	//HAL_HSEM_FastTake(HSEM_ID_0);
 	/*Release HSEM in order to notify the CPU2(CM4)*/
-	HAL_HSEM_Release(HSEM_ID_0,0);
+	//HAL_HSEM_Release(HSEM_ID_0,0);
 	/* wait until CPU2 wakes up from stop mode */
-	timeout = 0xFFFF;
-	while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
-	if ( timeout < 0 )
-	{
-		Error_Handler();
-	}
+	//timeout = 0xFFFF;
+	//while((__HAL_RCC_GET_FLAG(RCC_FLAG_D2CKRDY) == RESET) && (timeout-- > 0));
+	//if ( timeout < 0 )
+	//{
+		//Error_Handler();
+	//}
 	/* USER CODE END Boot_Mode_Sequence_2 */
 
 	/* USER CODE BEGIN SysInit */
@@ -137,14 +138,64 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 
-	//TODO: ONE OR MORE OF THESE HANG
-	//MX_I2C2_Init();
-	//MX_SDMMC1_SD_Init();
-	//MX_SPI6_Init();
-	//MX_USART1_UART_Init();
+	MX_I2C2_Init();
+	//MX_SDMMC1_SD_Init(); //TODO: modify so it does not hang/freeze if no SD card is inserted
+	MX_SPI6_Init();
+	MX_USART1_UART_Init();
 
-	//MX_USB_DEVICE_Init(); // HANGS
+	GPIOA->BSRR = GPIO_PIN_13;
+
+	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
+
+	/*FLASH_OBProgramInitTypeDef odb = {0};
+	odb.Banks = FLASH_BANK_2;
+	HAL_FLASHEx_OBGetConfig(&odb);
+
+	if(odb.WRPState == OB_WRPSTATE_ENABLE)
+	{
+		uTest = 10;
+	}
+	else if(odb.WRPState == OB_WRPSTATE_DISABLE)
+	{
+		uTest = 5;
+	}
+	else
+	{
+		uTest = 2;
+	}*/
+
+	// this code successfully writes
+	/*
+	HAL_FLASH_Unlock(); //unlock flash writing
+	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_ALL_ERRORS_BANK1 | FLASH_FLAG_ALL_ERRORS_BANK2);
+	FLASH_EraseInitTypeDef EraseInitStruct;
+	EraseInitStruct.Banks = FLASH_BANK_2;
+	EraseInitStruct.Sector = FLASH_SECTOR_0; // bank 2 sector 0 is sector 8
+	EraseInitStruct.TypeErase = TYPEERASE_SECTORS;
+	EraseInitStruct.VoltageRange = FLASH_VOLTAGE_RANGE_3;
+	EraseInitStruct.NbSectors = 1;
+	uint32_t SectorError = 0;
+	if (HAL_FLASHEx_Erase(&EraseInitStruct, &SectorError) != HAL_OK)
+	{
+		uTest = 5;
+	}
+	else
+	{
+
+		uint32_t saveData[8] = {0x12345678, 0x12345678,0x12345678,0x12345678,0x12345678,0x12345678,0x12345678,0x12345678};
+
+		if(HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASHWORD,0x08100000,(uint32_t)saveData) != HAL_OK)
+		{
+			uTest = 7;
+		}
+		else
+		{
+			uTest = 10;
+		}
+	}
+	HAL_FLASH_Lock();
+	*/
 
 	/* USER CODE END 2 */
 
@@ -157,10 +208,27 @@ int main(void)
 		/* USER CODE BEGIN 3 */
 
 		// GPIO TESTING: WORKS
-		GPIOC->BSRR = DISP_RST_Pin; // set it high
+		/*GPIOC->BSRR = DISP_RST_Pin; // set it high
 		HAL_Delay(1000);
 		GPIOC->BSRR = (DISP_RST_Pin << 16); // set it low
+		HAL_Delay(1000);*/
+
+		// GPIO SNES_RESET_PIN
+		/*GPIOA->BSRR = GPIO_PIN_13; // set it high
 		HAL_Delay(1000);
+		GPIOA->BSRR = (GPIO_PIN_13 << 16); // set it low
+		HAL_Delay(1000);*/
+
+		GPIOA->BSRR = GPIO_PIN_13 << 16;
+        //HAL_Delay(5000);
+
+        for (uint32_t i = 0; i < 1; i++)
+        {
+            GPIOA->BSRR = GPIO_PIN_13;
+            HAL_Delay(750);
+            GPIOA->BSRR = GPIO_PIN_13 << 16;
+            HAL_Delay(750);
+        }
 
 		// software reset code: WORKS
 		//HAL_Delay(5000);
@@ -445,6 +513,12 @@ static void MX_GPIO_Init(void)
 	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
 	HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+	GPIO_InitStruct.Pin = GPIO_PIN_13;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 }
 
 /* USER CODE BEGIN 4 */

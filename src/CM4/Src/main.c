@@ -112,9 +112,9 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		GPIOA->BSRR = GPIO_PIN_13;
+		GPIOA->BSRR = SNES_RESET_Pin;
 		HAL_Delay(1000);
-		GPIOA->BSRR = (GPIO_PIN_13 << 16);
+		GPIOA->BSRR = (SNES_RESET_Pin << 16);
 		HAL_Delay(1000);
 	}
 	/* USER CODE END 3 */
@@ -133,12 +133,12 @@ static void MX_GPIO_Init(void)
 	__HAL_RCC_GPIOA_CLK_ENABLE();
 
 	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(SNES_RESET_GPIO_Port, SNES_RESET_Pin, GPIO_PIN_RESET);
+	HAL_GPIO_WritePin(SNES_RESET_GPIO_Port, SNES_RESET_Pin, GPIO_PIN_SET);
 
 	/*Configure GPIO pin : RESET */
 	GPIO_InitStruct.Pin = SNES_RESET_Pin;
 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
 	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
 	HAL_GPIO_Init(SNES_RESET_GPIO_Port, &GPIO_InitStruct);
 

@@ -120,7 +120,7 @@ BIN = $(CP) -O binary
 # CFLAGS
 #######################################
 # cpu
-CPU_CM4 = -mcpu=cortex-m7 # looks wrong but is right
+CPU_CM4 = -mcpu=cortex-m4
 CPU_CM7 = -mcpu=cortex-m7
 
 # fpu
