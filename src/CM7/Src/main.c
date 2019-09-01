@@ -148,11 +148,12 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	/*MX_I2C2_Init();
-	MX_SDMMC1_SD_Init();
+	MX_I2C2_Init();
+	//MX_SDMMC1_SD_Init();
 	MX_SPI6_Init();
 	MX_USART1_UART_Init();
-	MX_USB_DEVICE_Init();*/
+	MX_USB_DEVICE_Init();
+	setup_pin_output(GPIOC, GPIO_PIN_0, true);
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -162,7 +163,10 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-
+		GPIOC->BSRR = (GPIO_PIN_0 << 16);
+		HAL_Delay(1000);
+		GPIOC->BSRR = GPIO_PIN_0;
+		HAL_Delay(1000);
 		/* USER CODE BEGIN 3 */
 
 	}
