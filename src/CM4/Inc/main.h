@@ -59,8 +59,8 @@ void Error_Handler(void);
 
 /* Private defines -----------------------------------------------------------*/
 /* USER CODE BEGIN Private defines */
-#define SNES_RESET_Pin GPIO_PIN_13
 #define SNES_RESET_GPIO_Port GPIOA
+#define SNES_RESET_Pin GPIO_PIN_13
 
 #define RJ45_P1_2_Port GPIOA
 #define RJ45_P1_2_Pin GPIO_PIN_0
@@ -72,7 +72,7 @@ void Error_Handler(void);
 #define RJ45_P1_5_Pin GPIO_PIN_3
 #define RJ45_P1_6_Port GPIOA
 #define RJ45_P1_6_Pin GPIO_PIN_4
-#define RJ45_P1_7_Port GPIO
+#define RJ45_P1_7_Port GPIOA
 #define RJ45_P1_7_Pin GPIO_PIN_5
 #define RJ45_P1_8_Port GPIOA
 #define RJ45_P1_8_Pin GPIO_PIN_6

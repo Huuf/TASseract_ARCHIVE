@@ -24,7 +24,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,6 +71,18 @@ static void MX_USART1_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+    GPIO_InitStruct.Pin = pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(port, &GPIO_InitStruct);
+    port->BSRR = (high ? pin : (pin << 16));
+}
 
 /* USER CODE END 0 */
 
@@ -136,11 +148,11 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	MX_I2C2_Init();
+	/*MX_I2C2_Init();
 	MX_SDMMC1_SD_Init();
 	MX_SPI6_Init();
 	MX_USART1_UART_Init();
-	MX_USB_DEVICE_Init();
+	MX_USB_DEVICE_Init();*/
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -152,6 +164,7 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+
 	}
 	/* USER CODE END 3 */
 }
@@ -408,21 +421,12 @@ static void MX_USART1_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOG_CLK_ENABLE();
-
-  /*Configure GPIO pin : PA2 */
-  GPIO_InitStruct.Pin = GPIO_PIN_2;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
 }
 
 /* USER CODE BEGIN 4 */
