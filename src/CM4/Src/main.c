@@ -113,9 +113,9 @@ int main(void)
 
 		/* USER CODE BEGIN 3 */
 		GPIOA->BSRR = SNES_RESET_Pin;
-		HAL_Delay(1000);
+		HAL_Delay(750);
 		GPIOA->BSRR = (SNES_RESET_Pin << 16);
-		HAL_Delay(1000);
+		HAL_Delay(750);
 	}
 	/* USER CODE END 3 */
 }
