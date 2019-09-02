@@ -25,6 +25,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+
+#include "ra8875.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -74,17 +76,27 @@ static void MX_USART1_UART_Init(void);
 
 void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
-    GPIO_InitStruct.Pin = pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-    port->BSRR = (high ? pin : (pin << 16));
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(port, &GPIO_InitStruct);
+	port->BSRR = (high ? pin : (pin << 16));
 }
 
 /* USER CODE END 0 */
+void setup_pin_input(GPIO_TypeDef *port, uint16_t pin, uint32_t pull)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = pull;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(port, &GPIO_InitStruct);
+}
 
 /**
   * @brief  The application entry point.
@@ -153,9 +165,13 @@ int main(void)
 	MX_SPI6_Init();
 	MX_USART1_UART_Init();
 	MX_USB_DEVICE_Init();
-	setup_pin_output(GPIOC, GPIO_PIN_0, true);
 	/* USER CODE BEGIN 2 */
-
+	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
+	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
+	struct ra8875_state *ra8875 = NULL;
+	 ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin, DISP_INT_GPIO_Port, DISP_INT_Pin);
+	ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0xFFFF, false);
+	ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0x0000, false);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -167,6 +183,7 @@ int main(void)
 		HAL_Delay(1000);
 		GPIOC->BSRR = GPIO_PIN_0;
 		HAL_Delay(1000);
+		CDC_Transmit_FS("A\n", 2);
 		/* USER CODE BEGIN 3 */
 
 	}

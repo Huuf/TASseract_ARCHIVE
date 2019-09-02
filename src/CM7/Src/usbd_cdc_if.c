@@ -180,6 +180,9 @@ static int8_t CDC_DeInit_FS(void)
   * @param  length: Number of data to be sent (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
+static uint8_t lineCoding[7] // <------- add these three lines
+// 115200bps, 1stop, no parity, 8bit
+= {0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x08};
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 5 */
@@ -223,11 +226,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+    memcpy( lineCoding, pbuf, sizeof(lineCoding) );
     break;
 
     case CDC_GET_LINE_CODING:
-
+    memcpy( pbuf, lineCoding, sizeof(lineCoding) );
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
