@@ -22,13 +22,17 @@
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
+#include <stdbool.h>
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+struct gpio_combo {
+	GPIO_TypeDef *port;
+	uint16_t pin;
+};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -37,7 +41,65 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 
 /* USER CODE END PD */
-
+struct gpio_combo test_gpios[] = {
+	{ SNES_RESET_GPIO_Port, SNES_RESET_Pin },
+	{ RJ45_P1_2_Port, RJ45_P1_2_Pin },
+	{ RJ45_P1_3_Port, RJ45_P1_3_Pin },
+	{ RJ45_P1_4_Port, RJ45_P1_4_Pin },
+	{ RJ45_P1_5_Port, RJ45_P1_5_Pin },
+	{ RJ45_P1_6_Port, RJ45_P1_6_Pin },
+	{ RJ45_P1_7_Port, RJ45_P1_7_Pin },
+	{ RJ45_P1_8_Port, RJ45_P1_8_Pin },
+	{ RJ45_P2_2_Port, RJ45_P2_2_Pin },
+	{ RJ45_P2_3_Port, RJ45_P2_3_Pin },
+	{ RJ45_P2_4_Port, RJ45_P2_4_Pin },
+	{ RJ45_P2_5_Port, RJ45_P2_5_Pin },
+	{ RJ45_P2_6_Port, RJ45_P2_6_Pin },
+	{ RJ45_P2_7_Port, RJ45_P2_7_Pin },
+	{ RJ45_P2_8_Port, RJ45_P2_8_Pin },
+	{ RJ45_P3_2_Port, RJ45_P3_2_Pin },
+	{ RJ45_P3_3_Port, RJ45_P3_3_Pin },
+	{ RJ45_P3_4_Port, RJ45_P3_4_Pin },
+	{ RJ45_P3_5_Port, RJ45_P3_5_Pin },
+	{ RJ45_P3_6_Port, RJ45_P3_6_Pin },
+	{ RJ45_P3_7_Port, RJ45_P3_7_Pin },
+	{ RJ45_P3_8_Port, RJ45_P3_8_Pin },
+	{ RJ45_P4_2_Port, RJ45_P4_2_Pin },
+	{ RJ45_P4_3_Port, RJ45_P4_3_Pin },
+	{ RJ45_P4_4_Port, RJ45_P4_4_Pin },
+	{ RJ45_P4_5_Port, RJ45_P4_5_Pin },
+	{ RJ45_P4_6_Port, RJ45_P4_6_Pin },
+	{ RJ45_P4_7_Port, RJ45_P4_7_Pin },
+	{ RJ45_P4_8_Port, RJ45_P4_8_Pin },
+	{ RJ45_V1_2_Port, RJ45_V1_2_Pin },
+	{ RJ45_V1_3_Port, RJ45_V1_3_Pin },
+	{ RJ45_V1_4_Port, RJ45_V1_4_Pin },
+	{ RJ45_V1_5_Port, RJ45_V1_5_Pin },
+	{ RJ45_V1_6_Port, RJ45_V1_6_Pin },
+	{ RJ45_V1_7_Port, RJ45_V1_7_Pin },
+	{ RJ45_V1_8_Port, RJ45_V1_8_Pin },
+	{ RJ45_V2_2_Port, RJ45_V2_2_Pin },
+	{ RJ45_V2_3_Port, RJ45_V2_3_Pin },
+	{ RJ45_V2_4_Port, RJ45_V2_4_Pin },
+	{ RJ45_V2_5_Port, RJ45_V2_5_Pin },
+	{ RJ45_V2_6_Port, RJ45_V2_6_Pin },
+	{ RJ45_V2_7_Port, RJ45_V2_7_Pin },
+	{ RJ45_V2_8_Port, RJ45_V2_8_Pin },
+	{ RJ45_V3_2_Port, RJ45_V3_2_Pin },
+	{ RJ45_V3_3_Port, RJ45_V3_3_Pin },
+	{ RJ45_V3_4_Port, RJ45_V3_4_Pin },
+	{ RJ45_V3_5_Port, RJ45_V3_5_Pin },
+	{ RJ45_V3_6_Port, RJ45_V3_6_Pin },
+	{ RJ45_V3_7_Port, RJ45_V3_7_Pin },
+	{ RJ45_V3_8_Port, RJ45_V3_8_Pin },
+	{ RJ45_V4_2_Port, RJ45_V4_2_Pin },
+	{ RJ45_V4_3_Port, RJ45_V4_3_Pin },
+	{ RJ45_V4_4_Port, RJ45_V4_4_Pin },
+	{ RJ45_V4_5_Port, RJ45_V4_5_Pin },
+	{ RJ45_V4_6_Port, RJ45_V4_6_Pin },
+	{ RJ45_V4_7_Port, RJ45_V4_7_Pin },
+	{ RJ45_V4_8_Port, RJ45_V4_8_Pin },
+};
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -58,6 +120,18 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+    GPIO_InitStruct.Pin = pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(port, &GPIO_InitStruct);
+    port->BSRR = (high ? pin : (pin << 16));
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -67,7 +141,7 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-
+	int32_t port_count = sizeof(test_gpios) / sizeof(test_gpios[0]);
 	/* USER CODE END 1 */
 
 
@@ -101,6 +175,9 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
+	for (uint32_t i = 0; i < port_count; i++) {
+		setup_pin_output(test_gpios[i].port, test_gpios[i].pin, true);
+	}
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -112,6 +189,12 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		for (uint32_t i = 0; i < port_count; i++) {
+			test_gpios[i].port->BSRR = test_gpios[i].pin << 16;
+			HAL_Delay(1000);
+			test_gpios[i].port->BSRR = test_gpios[i].pin;
+			HAL_Delay(1000);
+		}
 	}
 	/* USER CODE END 3 */
 }
@@ -123,20 +206,16 @@ int main(void)
   */
 static void MX_GPIO_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOF_CLK_ENABLE();
+	__HAL_RCC_GPIOG_CLK_ENABLE();
+	__HAL_RCC_GPIOH_CLK_ENABLE();
 
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(SNES_RESET_GPIO_Port, SNES_RESET_Pin, GPIO_PIN_RESET);
-
-	/*Configure GPIO pin : RESET */
-	GPIO_InitStruct.Pin = SNES_RESET_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(SNES_RESET_GPIO_Port, &GPIO_InitStruct);
 
 }
 
