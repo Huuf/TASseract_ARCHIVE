@@ -1,5 +1,5 @@
-# TAStm32H745ZIT6
-Needs a better name but hey.
+# TASseract
+It got a better name!
 
 # Releases
 If you want to get the most reliable version, check the releases, any other links can be in development and non working (currently no design is verified working yet).
