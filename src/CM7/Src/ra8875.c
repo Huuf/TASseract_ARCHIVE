@@ -323,10 +323,12 @@ exit_function:
 
 ra8875_result ra8875_cmd_write(struct ra8875_state *state, uint8_t command)
 {
-	return (HAL_SPI_Transmit(state->spi_port, &command, 1, 500) == HAL_OK) ? RA8875_OK : RA8875_SPI_ERROR;
+	uint8_t full_command[2] = {0x80, command};
+	return (HAL_SPI_Transmit(state->spi_port, full_command, 2, 500) == HAL_OK) ? RA8875_OK : RA8875_SPI_ERROR;
 }
 
 ra8875_result ra8875_data_write(struct ra8875_state *state, uint8_t data)
 {
-	return (HAL_SPI_Transmit(state->spi_port, &data, 1, 500) == HAL_OK) ? RA8875_OK : RA8875_SPI_ERROR;
+	uint8_t full_data[2] = {0x00, data};
+	return (HAL_SPI_Transmit(state->spi_port, full_data, 2, 500) == HAL_OK) ? RA8875_OK : RA8875_SPI_ERROR;
 }
