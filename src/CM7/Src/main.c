@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "usbd_cdc_if.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -169,21 +170,29 @@ int main(void)
 	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
 	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
 	struct ra8875_state *ra8875 = NULL;
-	 ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin, DISP_INT_GPIO_Port, DISP_INT_Pin);
-	ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0xFFFF, false);
-	ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0x0000, false);
+	HAL_Delay(1000);
+	ra8875_result res = ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin, DISP_INT_GPIO_Port, DISP_INT_Pin);
+	if (res == RA8875_OK) {
+		ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0xFFFF, false);
+		ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0x0000, false);
+	}
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
+	uint16_t x, y;
+	uint8_t state_value[255];
 	while (1)
 	{
 		/* USER CODE END WHILE */
-		GPIOC->BSRR = (GPIO_PIN_0 << 16);
 		HAL_Delay(1000);
-		GPIOC->BSRR = GPIO_PIN_0;
-		HAL_Delay(1000);
-		CDC_Transmit_FS("A\n", 2);
+		if (ra8875_read_touch(ra8875, &x, &y)) {
+			snprintf(state_value, 255, "Touching: %d %d\r\n", x, y);
+			CDC_Transmit_FS(state_value, strlen(state_value));
+		}
+		else {
+			CDC_Transmit_FS("NO TOUCHY\r\n", strlen("NO TOUCHY\r\n"));
+		}
 		/* USER CODE BEGIN 3 */
 
 	}
@@ -358,11 +367,11 @@ static void MX_SPI6_Init(void)
   hspi6.Instance = SPI6;
   hspi6.Init.Mode = SPI_MODE_MASTER;
   hspi6.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi6.Init.DataSize = SPI_DATASIZE_4BIT;
-  hspi6.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi6.Init.CLKPhase = SPI_PHASE_1EDGE;
+  hspi6.Init.DataSize = SPI_DATASIZE_8BIT;
+  hspi6.Init.CLKPolarity = SPI_POLARITY_HIGH;
+  hspi6.Init.CLKPhase = SPI_PHASE_2EDGE;
   hspi6.Init.NSS = SPI_NSS_SOFT;
-  hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi6.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi6.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi6.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
