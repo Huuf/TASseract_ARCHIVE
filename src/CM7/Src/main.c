@@ -189,7 +189,7 @@ int main(void)
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	uint16_t x, y;
-	uint8_t state_value[255];
+	char state_value[255];
 	while (1)
 	{
 	}
@@ -199,10 +199,10 @@ int main(void)
 		HAL_Delay(1000);
 		if (ra8875_read_touch(ra8875, &x, &y)) {
 			snprintf(state_value, 255, "Touching: %d %d\r\n", x, y);
-			CDC_Transmit_FS(state_value, strlen(state_value));
+			CDC_Transmit_FS((uint8_t *)state_value, strlen(state_value));
 		}
 		else {
-			CDC_Transmit_FS("NO TOUCHY\r\n", strlen("NO TOUCHY\r\n"));
+			CDC_Transmit_FS((uint8_t *)"NO TOUCHY\r\n", strlen("NO TOUCHY\r\n"));
 		}
 		/* USER CODE BEGIN 3 */
 
