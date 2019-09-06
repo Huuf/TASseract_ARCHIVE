@@ -19,8 +19,13 @@ typedef enum ra8875_result {
 	RA8875_SPI_ERROR = 2,
 } ra8875_result;
 
-ra8875_result ra8875_initialize(struct ra8875_state **state_pointer, SPI_HandleTypeDef *spi_port, GPIO_TypeDef *RST_PORT, uint16_t RST_PIN, GPIO_TypeDef *INT_PORT, uint16_t INT_PIN);
+ra8875_result ra8875_initialize(struct ra8875_state **state_pointer, SPI_HandleTypeDef *spi_port, GPIO_TypeDef *RST_PORT, uint16_t RST_PIN,
+	GPIO_TypeDef *INT_PORT, uint16_t INT_PIN, GPIO_TypeDef *CS_PORT, uint16_t CS_PIN);
 ra8875_result ra8875_destroy(struct ra8875_state **state_pointer);
+ra8875_result ra8875_turn_on_display(struct ra8875_state *ra8875, bool on);
+ra8875_result ra8875_gpiox(struct ra8875_state *ra8875, bool state);
+ra8875_result ra8875_pwm1_setup(struct ra8875_state *ra8875, bool on, uint8_t divider);
+ra8875_result ra8875_pwm1_duty_cycle(struct ra8875_state *ra8875, uint8_t cycle);
 
 void ra8875_set_graphics_mode(struct ra8875_state *ra8875);
 void ra8875_draw_rectangle(struct ra8875_state *ra8875, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, bool outline);

@@ -169,12 +169,20 @@ int main(void)
 	/* USER CODE BEGIN 2 */
 	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
 	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
+	setup_pin_output(DISP_CS_GPIO_Port, DISP_CS_Pin, true);
 	struct ra8875_state *ra8875 = NULL;
 	HAL_Delay(1000);
-	ra8875_result res = ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin, DISP_INT_GPIO_Port, DISP_INT_Pin);
+	ra8875_result res = ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin,
+		DISP_INT_GPIO_Port, DISP_INT_Pin, DISP_CS_GPIO_Port, DISP_CS_Pin);
+	ra8875_turn_on_display(ra8875, true);
+	ra8875_gpiox(ra8875, true);
+	ra8875_pwm1_setup(ra8875, true, 0x0A);
+	ra8875_pwm1_duty_cycle(ra8875, 0xFF);
 	if (res == RA8875_OK) {
-		ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0xFFFF, false);
-		ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0x0000, false);
+		ra8875_set_graphics_mode(ra8875);
+		ra8875_draw_rectangle(ra8875, 0, 0, 800, 480, 0x0000, false);
+		ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0x001F, false);
+		//ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0xF800, false);
 	}
 	/* USER CODE END 2 */
 
@@ -183,6 +191,9 @@ int main(void)
 	uint16_t x, y;
 	uint8_t state_value[255];
 	while (1)
+	{
+	}
+	while (0)
 	{
 		/* USER CODE END WHILE */
 		HAL_Delay(1000);
@@ -368,8 +379,8 @@ static void MX_SPI6_Init(void)
   hspi6.Init.Mode = SPI_MODE_MASTER;
   hspi6.Init.Direction = SPI_DIRECTION_2LINES;
   hspi6.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi6.Init.CLKPolarity = SPI_POLARITY_HIGH;
-  hspi6.Init.CLKPhase = SPI_PHASE_2EDGE;
+  hspi6.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi6.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi6.Init.NSS = SPI_NSS_SOFT;
   hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi6.Init.FirstBit = SPI_FIRSTBIT_MSB;

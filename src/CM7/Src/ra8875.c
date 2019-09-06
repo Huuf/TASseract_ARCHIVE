@@ -13,6 +13,8 @@ struct ra8875_state {
 	uint16_t           RST_PIN;
 	GPIO_TypeDef      *INT_PORT;
 	uint16_t           INT_PIN;
+	GPIO_TypeDef      *CS_PORT;
+	uint16_t           CS_PIN;
 	SPI_HandleTypeDef *spi_port;
 };
 
@@ -180,7 +182,8 @@ ra8875_result ra8875_init_lcd(struct ra8875_state *state);
 ra8875_result ra8875_read_register(struct ra8875_state *state, uint8_t reg, uint8_t *value);
 void ra8875_wait_for_register_flag(struct ra8875_state *state, uint8_t reg, uint8_t flag);
 
-ra8875_result ra8875_initialize(struct ra8875_state **state_pointer, SPI_HandleTypeDef *spi_port, GPIO_TypeDef *RST_PORT, uint16_t RST_PIN, GPIO_TypeDef *INT_PORT, uint16_t INT_PIN)
+ra8875_result ra8875_initialize(struct ra8875_state **state_pointer, SPI_HandleTypeDef *spi_port, GPIO_TypeDef *RST_PORT, uint16_t RST_PIN,
+	GPIO_TypeDef *INT_PORT, uint16_t INT_PIN, GPIO_TypeDef *CS_PORT, uint16_t CS_PIN)
 {
 	if (state_pointer == NULL) return RA8875_INVALID_POINTER;
 	if (*state_pointer != NULL) return RA8875_INVALID_POINTER;
@@ -191,14 +194,13 @@ ra8875_result ra8875_initialize(struct ra8875_state **state_pointer, SPI_HandleT
 	state->RST_PIN = RST_PIN;
 	state->INT_PORT = INT_PORT;
 	state->INT_PIN = INT_PIN;
+	state->CS_PORT = CS_PORT;
+	state->CS_PIN = CS_PIN;
 
 	ra8875_result rv = RA8875_OK;
 	check_result(ra8875_reset(state));
 	uint8_t val = 0;
 	ra8875_read_register(state, RA8875_REG_STSR, &val);
-	uint8_t state_value[255];
-	snprintf(state_value, 255, "RA8875 State: %u\r\n", val);
-	CDC_Transmit_FS(state_value, strlen(state_value));
 
 	check_result(ra8875_init_pll(state));
 	check_result(ra8875_init_lcd(state));
@@ -216,6 +218,26 @@ ra8875_result ra8875_destroy(struct ra8875_state **state_pointer)
 	free(*state_pointer);
 	*state_pointer = NULL;
 	return RA8875_OK;
+}
+
+ra8875_result ra8875_turn_on_display(struct ra8875_state *ra8875, bool on)
+{
+	return ra8875_set_register(ra8875, RA8875_REG_PWRR, on ? 0x80 : 0x00);
+}
+
+ra8875_result ra8875_gpiox(struct ra8875_state *ra8875, bool state)
+{
+	return ra8875_set_register(ra8875, RA8875_REG_GPIOX, state ? 0x01 : 0x00);
+}
+
+ra8875_result ra8875_pwm1_setup(struct ra8875_state *ra8875, bool on, uint8_t divider)
+{
+	return ra8875_set_register(ra8875, RA8875_REG_P1CR, (on ? 0x80 : 0x00) | divider);
+}
+
+ra8875_result ra8875_pwm1_duty_cycle(struct ra8875_state *ra8875, uint8_t cycle)
+{
+	return ra8875_set_register(ra8875, RA8875_REG_P1DCR, cycle);
 }
 
 void ra8875_set_graphics_mode(struct ra8875_state *ra8875)
@@ -376,7 +398,7 @@ ra8875_result ra8875_init_lcd(struct ra8875_state *state)
 	// PDAT is fetched at PCLK falling edge
 	// PCLK period = 2 times of System Clock period.
 	check_result(ra8875_set_register(state, RA8875_REG_PCSR, 0x81));
-	HAL_Delay(100);
+	HAL_Delay(1);
 
 	check_result(ra8875_set_register(state, RA8875_REG_HDWR, 0x63));
 
@@ -402,7 +424,7 @@ ra8875_result ra8875_init_lcd(struct ra8875_state *state)
 	check_result(ra8875_set_register(state, RA8875_REG_VDHR1, 0x01));
 	//VNDR0 //Vertical Non-Display Period Bit [7:0]
 	//Vertical Non-Display area = (VNDR + 1)
-	check_result(ra8875_set_register(state, RA8875_REG_VNDR0, 0x20));
+	check_result(ra8875_set_register(state, RA8875_REG_VNDR0, 0x1F));
 	//VNDR1 //Vertical Non-Display Period Bit [8]
 	//Vertical Non-Display area = (VNDR + 1)
 	check_result(ra8875_set_register(state, RA8875_REG_VNDR1, 0x00));
@@ -448,7 +470,7 @@ ra8875_result ra8875_init_lcd(struct ra8875_state *state)
 	//Clear screen
 	check_result(ra8875_set_register(state, RA8875_REG_MCLR, 0x80));
 
-	//Delay1ms(100);
+	HAL_Delay(500);
 
 exit_function:
 	return rv;
@@ -459,9 +481,9 @@ ra8875_result ra8875_init_pll(struct ra8875_state *state)
 	ra8875_result rv = RA8875_OK;
 
 	check_result(ra8875_set_register(state, RA8875_REG_PLLC1, 0x0b));
-	HAL_Delay(100);
+	HAL_Delay(1);
 	check_result(ra8875_set_register(state, RA8875_REG_PLLC2, 0x02));
-	HAL_Delay(100);
+	HAL_Delay(1);
 exit_function:
 	return rv;
 }
@@ -486,27 +508,39 @@ exit_function:
 
 ra8875_result ra8875_cmd_write(struct ra8875_state *state, uint8_t command)
 {
+	state->CS_PORT->BSRR = state->CS_PIN << 16;
 	uint8_t full_command[2] = {0x80, command};
 	HAL_SPI_Transmit(state->spi_port, full_command, 2, 500);
 	while (HAL_SPI_GetState(state->spi_port) != HAL_SPI_STATE_READY);
+	state->CS_PORT->BSRR = state->CS_PIN;
+	//HAL_Delay(1);
 	return RA8875_OK;
 }
 
 ra8875_result ra8875_data_write(struct ra8875_state *state, uint8_t data)
 {
+	state->CS_PORT->BSRR = state->CS_PIN << 16;
 	uint8_t full_data[2] = {0x00, data};
 	HAL_SPI_Transmit(state->spi_port, full_data, 2, 500);
 	while (HAL_SPI_GetState(state->spi_port) != HAL_SPI_STATE_READY);
+	state->CS_PORT->BSRR = state->CS_PIN;
+	//HAL_Delay(1);
 	return RA8875_OK;
 }
 
 
 ra8875_result ra8875_read_register(struct ra8875_state *state, uint8_t reg, uint8_t *value)
 {
-	uint8_t read_reg[3] = {0x80, reg, 0xc0};
-	HAL_SPI_Transmit(state->spi_port, read_reg, 3, 500);
+	ra8875_cmd_write(state, reg);
+	state->CS_PORT->BSRR = state->CS_PIN << 16;
+	uint8_t read_reg = 0x40;
+	HAL_SPI_Transmit(state->spi_port, &read_reg, 1, 500);
 	while (HAL_SPI_GetState(state->spi_port) != HAL_SPI_STATE_READY);
-	return (HAL_OK == HAL_SPI_Receive(state->spi_port, value, 1, 500)) ? RA8875_OK : RA8875_SPI_ERROR;
+	read_reg = 0x00;
+	ra8875_result res = (HAL_OK == HAL_SPI_TransmitReceive(state->spi_port, &read_reg, &value, 1, 500)) ? RA8875_OK : RA8875_SPI_ERROR;
+	state->CS_PORT->BSRR = state->CS_PIN;
+	//HAL_Delay(1);
+	return res;
 }
 
 void ra8875_wait_for_register_flag(struct ra8875_state *state, uint8_t reg, uint8_t flag)
