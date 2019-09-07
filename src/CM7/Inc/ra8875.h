@@ -35,7 +35,8 @@ void ra8875_set_text_cursor(struct ra8875_state *ra8875, uint16_t x, uint16_t y)
 void ra8875_set_text_color(struct ra8875_state *ra8875, uint16_t foreground, uint16_t background);
 void ra8875_set_text_transparent(struct ra8875_state *ra8875, uint16_t foreground);
 void ra8875_set_text_enlarge(struct ra8875_state *ra8875, uint8_t scale);
-void ra8875_text_Write(struct ra8875_state *ra8875, const char* buffer);
+void ra8875_text_write(struct ra8875_state *ra8875, const char* buffer);
+void ra8875_debug_draw(struct ra8875_state *ra8875, uint16_t x, uint16_t y, const char* buffer);
 
 void ra8875_enable_touch(struct ra8875_state *ra8875);
 void ra8875_disable_touch(struct ra8875_state *ra8875);

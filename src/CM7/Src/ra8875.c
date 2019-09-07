@@ -293,6 +293,14 @@ void ra8875_draw_line(struct ra8875_state *ra8875, int16_t x1, int16_t y1, int16
 	ra8875_wait_for_register_flag(ra8875, RA8875_REG_DCR, 0x80);
 }
 
+void ra8875_debug_draw(struct ra8875_state *ra8875, uint16_t x, uint16_t y, const char* buffer)
+{
+	ra8875_set_text_mode(ra8875);
+	ra8875_set_text_cursor(ra8875, x, y);
+	ra8875_set_text_color(ra8875, 0xFFFF, 0x0000);
+	ra8875_text_write(ra8875, buffer);
+}
+
 void ra8875_set_text_mode(struct ra8875_state *ra8875)
 {
 	uint8_t cur_value = 0;
@@ -346,7 +354,7 @@ void ra8875_set_text_enlarge(struct ra8875_state *ra8875, uint8_t scale)
 	ra8875_set_register(ra8875, RA8875_REG_FNCR1, (cur_value & ~0x0F) | (scale << 2) | (scale));
 }
 
-void ra8875_text_Write(struct ra8875_state *ra8875, const char* buffer)
+void ra8875_text_write(struct ra8875_state *ra8875, const char* buffer)
 {
 	size_t len = strlen(buffer);
 	ra8875_cmd_write(ra8875, RA8875_REG_MRWC);

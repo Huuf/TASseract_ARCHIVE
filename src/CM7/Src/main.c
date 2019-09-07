@@ -183,6 +183,7 @@ int main(void)
 		ra8875_draw_rectangle(ra8875, 0, 0, 800, 480, 0x0000, false);
 		ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0x001F, false);
 		//ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0xF800, false);
+		ra8875_debug_draw(ra8875, 100, 100, "Sample text!");
 	}
 	/* USER CODE END 2 */
 
