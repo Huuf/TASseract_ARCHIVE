@@ -537,7 +537,7 @@ ra8875_result ra8875_read_register(struct ra8875_state *state, uint8_t reg, uint
 	HAL_SPI_Transmit(state->spi_port, &read_reg, 1, 500);
 	while (HAL_SPI_GetState(state->spi_port) != HAL_SPI_STATE_READY);
 	read_reg = 0x00;
-	ra8875_result res = (HAL_OK == HAL_SPI_TransmitReceive(state->spi_port, &read_reg, &value, 1, 500)) ? RA8875_OK : RA8875_SPI_ERROR;
+	ra8875_result res = (HAL_OK == HAL_SPI_TransmitReceive(state->spi_port, &read_reg, value, 1, 500)) ? RA8875_OK : RA8875_SPI_ERROR;
 	while (HAL_SPI_GetState(state->spi_port) != HAL_SPI_STATE_READY);
 	state->CS_PORT->BSRR = state->CS_PIN;
 	//HAL_Delay(1);
