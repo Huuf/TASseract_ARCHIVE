@@ -70,8 +70,7 @@ C_SOURCES_CM4 =  \
 $(C_SOURCES_COMMON) \
 CM4/Src/main.c \
 CM4/Src/stm32h7xx_it.c \
-CM4/Src/stm32h7xx_hal_msp.c \
-CM4/Src/sleep_us_cm4.c
+CM4/Src/stm32h7xx_hal_msp.c
 
 
 C_SOURCES_CM7 =  \
@@ -84,7 +83,6 @@ CM7/Src/usbd_desc.c \
 CM7/Src/usbd_cdc_if.c \
 CM7/Src/stm32h7xx_it.c \
 CM7/Src/stm32h7xx_hal_msp.c \
-CM7/Src/sleep_us_cm7.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
 Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
@@ -92,9 +90,12 @@ Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
 
 # ASM sources
 ASM_SOURCES_CM4 =  \
-startup_stm32h745xx_CM4.s
+	CM4/sleep_us_cm4.s \
+	CM4/startup_stm32h745xx_CM4.s
+
 ASM_SOURCES_CM7 =  \
-startup_stm32h745xx_CM7.s
+	CM7/sleep_us_cm7.s \
+	CM7/startup_stm32h745xx_CM7.s
 
 
 #######################################

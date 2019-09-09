@@ -28,6 +28,7 @@
 #include <stdbool.h>
 
 #include "ra8875.h"
+#include "sleep_us_cm7.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -173,10 +174,10 @@ int main(void)
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
+	__disable_irq();
 	while (1)
 	{
 		/* USER CODE END WHILE */
-
 		/* USER CODE BEGIN 3 */
 
 	}
