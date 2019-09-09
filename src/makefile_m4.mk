@@ -11,10 +11,10 @@ vpath %.s $(sort $(dir $(ASM_SOURCES_CM4)))
 
 copy_cm4: $(OUT_DIR)
 ifeq ($(OS),Windows_NT)
-	copy $(BUILD_DIR_CM4)\\$(TARGET_CM4).elf out\\$(TARGET_CM4).elf
-	copy $(BUILD_DIR_CM4)\\$(TARGET_CM4).hex out\\$(TARGET_CM4).hex
-	copy $(BUILD_DIR_CM4)\\$(TARGET_CM4).bin out\\$(TARGET_CM4).bin
-	copy $(BUILD_DIR_CM4)\\$(TARGET_CM4).map out\\$(TARGET_CM4).map
+	copy $(BUILD_DIR_CM4)\$(TARGET_CM4).elf out\$(TARGET_CM4).elf
+	copy $(BUILD_DIR_CM4)\$(TARGET_CM4).hex out\$(TARGET_CM4).hex
+	copy $(BUILD_DIR_CM4)\$(TARGET_CM4).bin out\$(TARGET_CM4).bin
+	copy $(BUILD_DIR_CM4)\$(TARGET_CM4).map out\$(TARGET_CM4).map
 else
 	cp -f $(BUILD_DIR_CM4)/$(TARGET_CM4).elf out/$(TARGET_CM4).elf
 	cp -f $(BUILD_DIR_CM4)/$(TARGET_CM4).hex out/$(TARGET_CM4).hex
