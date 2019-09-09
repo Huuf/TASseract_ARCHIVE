@@ -374,7 +374,7 @@ void HAL_PWR_DisableWakeUpPin(uint32_t WakeUpPinx)
   *            @arg PWR_SLEEPENTRY_WFE: enter SLEEP mode with WFE instruction
   * @retval None
   */
-void HAL_PWR_EnterSLEEPMode(uint32_t Regulator, uint8_t SLEEPEntry)
+void HAL_PWR_EnterSLEEPMode(__attribute__((unused)) uint32_t Regulator, uint8_t SLEEPEntry)
 {
   /* Check the parameters */
   assert_param(IS_PWR_REGULATOR(Regulator));

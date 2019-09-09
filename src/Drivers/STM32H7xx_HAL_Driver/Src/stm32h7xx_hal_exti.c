@@ -751,7 +751,7 @@ void HAL_EXTI_IRQHandler(EXTI_HandleTypeDef *hexti)
   *         This parameter is kept for compatibility with other series.
   * @retval 1 if interrupt is pending else 0.
   */
-uint32_t HAL_EXTI_GetPending(EXTI_HandleTypeDef *hexti, uint32_t Edge)
+uint32_t HAL_EXTI_GetPending(EXTI_HandleTypeDef *hexti, __attribute__((unused)) uint32_t Edge)
 {
   __IO uint32_t *regaddr;
   uint32_t regval;
@@ -799,7 +799,7 @@ uint32_t HAL_EXTI_GetPending(EXTI_HandleTypeDef *hexti, uint32_t Edge)
   *         This parameter is kept for compatibility with other series.
   * @retval None.
   */
-void HAL_EXTI_ClearPending(EXTI_HandleTypeDef *hexti, uint32_t Edge)
+void HAL_EXTI_ClearPending(EXTI_HandleTypeDef *hexti, __attribute__((unused)) uint32_t Edge)
 {
   __IO uint32_t *regaddr;
   uint32_t maskline;

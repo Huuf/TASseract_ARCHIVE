@@ -142,7 +142,7 @@ FLASH_ProcessTypeDef pFlash;
   *
   * @retval HAL_StatusTypeDef HAL Status
   */
-HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
+HAL_StatusTypeDef HAL_FLASH_Program(__attribute__((unused)) uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
 {
   HAL_StatusTypeDef status;
   __IO uint32_t *dest_addr = (__IO uint32_t *)FlashAddress;
@@ -230,7 +230,7 @@ HAL_StatusTypeDef HAL_FLASH_Program(uint32_t TypeProgram, uint32_t FlashAddress,
   *
   * @retval HAL Status
   */
-HAL_StatusTypeDef HAL_FLASH_Program_IT(uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
+HAL_StatusTypeDef HAL_FLASH_Program_IT(__attribute__((unused)) uint32_t TypeProgram, uint32_t FlashAddress, uint32_t DataAddress)
 {
   HAL_StatusTypeDef status;
   __IO uint32_t *dest_addr = (__IO uint32_t*)FlashAddress;

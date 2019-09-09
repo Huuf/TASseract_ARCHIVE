@@ -21,10 +21,13 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "usb_device.h"
+#include "usbd_cdc_if.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdbool.h>
+
+#include "ra8875.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -66,7 +69,7 @@ static void MX_SDMMC1_SD_Init(void);
 static void MX_SPI6_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void initialize_ra8875(struct ra8875_state **ra8875);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -74,17 +77,27 @@ static void MX_USART1_UART_Init(void);
 
 void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
 {
-    GPIO_InitTypeDef GPIO_InitStruct = {0};
-    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
-    GPIO_InitStruct.Pin = pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-    GPIO_InitStruct.Pull = GPIO_PULLUP;
-    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-    HAL_GPIO_Init(port, &GPIO_InitStruct);
-    port->BSRR = (high ? pin : (pin << 16));
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_PULLUP;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(port, &GPIO_InitStruct);
+	port->BSRR = (high ? pin : (pin << 16));
 }
 
 /* USER CODE END 0 */
+void setup_pin_input(GPIO_TypeDef *port, uint16_t pin, uint32_t pull)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = pull;
+	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	HAL_GPIO_Init(port, &GPIO_InitStruct);
+}
 
 /**
   * @brief  The application entry point.
@@ -153,9 +166,9 @@ int main(void)
 	MX_SPI6_Init();
 	MX_USART1_UART_Init();
 	MX_USB_DEVICE_Init();
-	setup_pin_output(GPIOC, GPIO_PIN_0, true);
 	/* USER CODE BEGIN 2 */
-
+	struct ra8875_state *ra8875 = NULL;
+	initialize_ra8875(&ra8875);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -163,10 +176,7 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-		GPIOC->BSRR = (GPIO_PIN_0 << 16);
-		HAL_Delay(1000);
-		GPIOC->BSRR = GPIO_PIN_0;
-		HAL_Delay(1000);
+
 		/* USER CODE BEGIN 3 */
 
 	}
@@ -341,11 +351,11 @@ static void MX_SPI6_Init(void)
   hspi6.Instance = SPI6;
   hspi6.Init.Mode = SPI_MODE_MASTER;
   hspi6.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi6.Init.DataSize = SPI_DATASIZE_4BIT;
+  hspi6.Init.DataSize = SPI_DATASIZE_8BIT;
   hspi6.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi6.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi6.Init.NSS = SPI_NSS_SOFT;
-  hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi6.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi6.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi6.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi6.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
@@ -475,6 +485,22 @@ void jumpToDFU(void)
 
 	// jump!
 	SysMemBootJump();
+}
+
+void initialize_ra8875(struct ra8875_state **ra8875)
+{
+	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
+	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
+	setup_pin_output(DISP_CS_GPIO_Port, DISP_CS_Pin, true);
+	HAL_Delay(1000);
+	ra8875_result res = ra8875_initialize(ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin,
+		DISP_INT_GPIO_Port, DISP_INT_Pin, DISP_CS_GPIO_Port, DISP_CS_Pin);
+	if (res == RA8875_OK) {
+		ra8875_turn_on_display(*ra8875, true);
+		ra8875_gpiox(*ra8875, true);
+		ra8875_pwm1_setup(*ra8875, true, 0x0A);
+		ra8875_pwm1_duty_cycle(*ra8875, 0xFF);
+	}
 }
 /* USER CODE END 4 */
 
