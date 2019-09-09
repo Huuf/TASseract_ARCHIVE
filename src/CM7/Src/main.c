@@ -438,17 +438,34 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-// Many thanks to Tien Majerle, owner of https://stm32f4-discovery.net/, for help with this function
+// Source: https://community.st.com/s/article/STM32H7-bootloader-jump-from-application
 void jumpToDFU(void)
 {
+	uint32_t i=0;
 	void (*SysMemBootJump)(void);
 
 	volatile uint32_t addr = 0x1FF09800; // address of rom base
+
+	/* Disable all interrupts */
+    __disable_irq();
 
 	// clear SysTick
 	SysTick->CTRL = 0;
 	SysTick->LOAD = 0;
 	SysTick->VAL = 0;
+
+	/* Set the clock to the default state */
+    HAL_RCC_DeInit();
+
+    /* Clear Interrupt Enable Register & Interrupt Pending Register */
+    for (i=0;i<5;i++)
+    {
+		NVIC->ICER[i]=0xFFFFFFFF;
+		NVIC->ICPR[i]=0xFFFFFFFF;
+    }
+
+	/* Re-enable all interrupts */
+	__enable_irq();
 
 	// sets destination address of the jump. note it is one word into the bootloader code which is the first instruction
 	SysMemBootJump = (void (*)(void)) (*((uint32_t *)(addr + 4)));
