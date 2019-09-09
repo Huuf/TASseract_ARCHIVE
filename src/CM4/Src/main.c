@@ -41,65 +41,6 @@ struct gpio_combo {
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 
 /* USER CODE END PD */
-struct gpio_combo test_gpios[] = {
-	{ SNES_RESET_GPIO_Port, SNES_RESET_Pin },
-	{ RJ45_P1_2_Port, RJ45_P1_2_Pin },
-	{ RJ45_P1_3_Port, RJ45_P1_3_Pin },
-	{ RJ45_P1_4_Port, RJ45_P1_4_Pin },
-	{ RJ45_P1_5_Port, RJ45_P1_5_Pin },
-	{ RJ45_P1_6_Port, RJ45_P1_6_Pin },
-	{ RJ45_P1_7_Port, RJ45_P1_7_Pin },
-	{ RJ45_P1_8_Port, RJ45_P1_8_Pin },
-	{ RJ45_P2_2_Port, RJ45_P2_2_Pin },
-	{ RJ45_P2_3_Port, RJ45_P2_3_Pin },
-	{ RJ45_P2_4_Port, RJ45_P2_4_Pin },
-	{ RJ45_P2_5_Port, RJ45_P2_5_Pin },
-	{ RJ45_P2_6_Port, RJ45_P2_6_Pin },
-	{ RJ45_P2_7_Port, RJ45_P2_7_Pin },
-	{ RJ45_P2_8_Port, RJ45_P2_8_Pin },
-	{ RJ45_P3_2_Port, RJ45_P3_2_Pin },
-	{ RJ45_P3_3_Port, RJ45_P3_3_Pin },
-	{ RJ45_P3_4_Port, RJ45_P3_4_Pin },
-	{ RJ45_P3_5_Port, RJ45_P3_5_Pin },
-	{ RJ45_P3_6_Port, RJ45_P3_6_Pin },
-	{ RJ45_P3_7_Port, RJ45_P3_7_Pin },
-	{ RJ45_P3_8_Port, RJ45_P3_8_Pin },
-	{ RJ45_P4_2_Port, RJ45_P4_2_Pin },
-	{ RJ45_P4_3_Port, RJ45_P4_3_Pin },
-	{ RJ45_P4_4_Port, RJ45_P4_4_Pin },
-	{ RJ45_P4_5_Port, RJ45_P4_5_Pin },
-	{ RJ45_P4_6_Port, RJ45_P4_6_Pin },
-	{ RJ45_P4_7_Port, RJ45_P4_7_Pin },
-	{ RJ45_P4_8_Port, RJ45_P4_8_Pin },
-	{ RJ45_V1_2_Port, RJ45_V1_2_Pin },
-	{ RJ45_V1_3_Port, RJ45_V1_3_Pin },
-	{ RJ45_V1_4_Port, RJ45_V1_4_Pin },
-	{ RJ45_V1_5_Port, RJ45_V1_5_Pin },
-	{ RJ45_V1_6_Port, RJ45_V1_6_Pin },
-	{ RJ45_V1_7_Port, RJ45_V1_7_Pin },
-	{ RJ45_V1_8_Port, RJ45_V1_8_Pin },
-	{ RJ45_V2_2_Port, RJ45_V2_2_Pin },
-	{ RJ45_V2_3_Port, RJ45_V2_3_Pin },
-	{ RJ45_V2_4_Port, RJ45_V2_4_Pin },
-	{ RJ45_V2_5_Port, RJ45_V2_5_Pin },
-	{ RJ45_V2_6_Port, RJ45_V2_6_Pin },
-	{ RJ45_V2_7_Port, RJ45_V2_7_Pin },
-	{ RJ45_V2_8_Port, RJ45_V2_8_Pin },
-	{ RJ45_V3_2_Port, RJ45_V3_2_Pin },
-	{ RJ45_V3_3_Port, RJ45_V3_3_Pin },
-	{ RJ45_V3_4_Port, RJ45_V3_4_Pin },
-	{ RJ45_V3_5_Port, RJ45_V3_5_Pin },
-	{ RJ45_V3_6_Port, RJ45_V3_6_Pin },
-	{ RJ45_V3_7_Port, RJ45_V3_7_Pin },
-	{ RJ45_V3_8_Port, RJ45_V3_8_Pin },
-	{ RJ45_V4_2_Port, RJ45_V4_2_Pin },
-	{ RJ45_V4_3_Port, RJ45_V4_3_Pin },
-	{ RJ45_V4_4_Port, RJ45_V4_4_Pin },
-	{ RJ45_V4_5_Port, RJ45_V4_5_Pin },
-	{ RJ45_V4_6_Port, RJ45_V4_6_Pin },
-	{ RJ45_V4_7_Port, RJ45_V4_7_Pin },
-	{ RJ45_V4_8_Port, RJ45_V4_8_Pin },
-};
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -141,7 +82,6 @@ void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-	int32_t port_count = sizeof(test_gpios) / sizeof(test_gpios[0]);
 	/* USER CODE END 1 */
 
 
@@ -175,9 +115,6 @@ int main(void)
 
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
-	for (uint32_t i = 0; i < port_count; i++) {
-		setup_pin_output(test_gpios[i].port, test_gpios[i].pin, true);
-	}
 	/* USER CODE BEGIN 2 */
 
 	/* USER CODE END 2 */
@@ -189,12 +126,6 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		for (uint32_t i = 0; i < port_count; i++) {
-			test_gpios[i].port->BSRR = test_gpios[i].pin << 16;
-			HAL_Delay(1000);
-			test_gpios[i].port->BSRR = test_gpios[i].pin;
-			HAL_Delay(1000);
-		}
 	}
 	/* USER CODE END 3 */
 }

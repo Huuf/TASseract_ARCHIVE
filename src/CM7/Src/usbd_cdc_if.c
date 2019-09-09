@@ -226,11 +226,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-    memcpy( lineCoding, pbuf, sizeof(lineCoding) );
+    memcpy( lineCoding, pbuf, MIN(sizeof(lineCoding), length) );
     break;
 
     case CDC_GET_LINE_CODING:
-    memcpy( pbuf, lineCoding, sizeof(lineCoding) );
+    memcpy( pbuf, lineCoding, MIN(sizeof(lineCoding), length) );
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
@@ -263,7 +263,7 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
+static int8_t CDC_Receive_FS(uint8_t* Buf, __attribute__((unused)) uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);

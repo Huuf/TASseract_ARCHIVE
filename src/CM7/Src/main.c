@@ -69,7 +69,7 @@ static void MX_SDMMC1_SD_Init(void);
 static void MX_SPI6_Init(void);
 static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
-
+void initialize_ra8875(struct ra8875_state **ra8875);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -167,44 +167,16 @@ int main(void)
 	MX_USART1_UART_Init();
 	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
-	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
-	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
-	setup_pin_output(DISP_CS_GPIO_Port, DISP_CS_Pin, true);
 	struct ra8875_state *ra8875 = NULL;
-	HAL_Delay(1000);
-	ra8875_result res = ra8875_initialize(&ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin,
-		DISP_INT_GPIO_Port, DISP_INT_Pin, DISP_CS_GPIO_Port, DISP_CS_Pin);
-	ra8875_turn_on_display(ra8875, true);
-	ra8875_gpiox(ra8875, true);
-	ra8875_pwm1_setup(ra8875, true, 0x0A);
-	ra8875_pwm1_duty_cycle(ra8875, 0xFF);
-	if (res == RA8875_OK) {
-		ra8875_set_graphics_mode(ra8875);
-		ra8875_draw_rectangle(ra8875, 0, 0, 800, 480, 0x0000, false);
-		ra8875_draw_rectangle(ra8875, 0, 0, 50, 50, 0x001F, false);
-		//ra8875_draw_rectangle(ra8875, 50, 50, 50, 50, 0xF800, false);
-		ra8875_debug_draw(ra8875, 100, 100, "Sample text!");
-	}
+	initialize_ra8875(&ra8875);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	uint16_t x, y;
-	char state_value[255];
 	while (1)
 	{
-	}
-	while (0)
-	{
 		/* USER CODE END WHILE */
-		HAL_Delay(1000);
-		if (ra8875_read_touch(ra8875, &x, &y)) {
-			snprintf(state_value, 255, "Touching: %d %d\r\n", x, y);
-			CDC_Transmit_FS((uint8_t *)state_value, strlen(state_value));
-		}
-		else {
-			CDC_Transmit_FS((uint8_t *)"NO TOUCHY\r\n", strlen("NO TOUCHY\r\n"));
-		}
+
 		/* USER CODE BEGIN 3 */
 
 	}
@@ -513,6 +485,22 @@ void jumpToDFU(void)
 
 	// jump!
 	SysMemBootJump();
+}
+
+void initialize_ra8875(struct ra8875_state **ra8875)
+{
+	setup_pin_output(DISP_RST_GPIO_Port, DISP_RST_Pin, true);
+	setup_pin_input(DISP_INT_GPIO_Port, DISP_INT_Pin, GPIO_NOPULL);
+	setup_pin_output(DISP_CS_GPIO_Port, DISP_CS_Pin, true);
+	HAL_Delay(1000);
+	ra8875_result res = ra8875_initialize(ra8875, &hspi6, DISP_RST_GPIO_Port, DISP_RST_Pin,
+		DISP_INT_GPIO_Port, DISP_INT_Pin, DISP_CS_GPIO_Port, DISP_CS_Pin);
+	if (res == RA8875_OK) {
+		ra8875_turn_on_display(*ra8875, true);
+		ra8875_gpiox(*ra8875, true);
+		ra8875_pwm1_setup(*ra8875, true, 0x0A);
+		ra8875_pwm1_duty_cycle(*ra8875, 0xFF);
+	}
 }
 /* USER CODE END 4 */
 

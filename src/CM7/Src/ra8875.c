@@ -392,6 +392,7 @@ bool ra8875_read_touch(struct ra8875_state *ra8875, uint16_t *x, uint16_t *y)
 		if (ra8875_read_register(ra8875, RA8875_REG_TPXYL, &temp_xy) != RA8875_OK) return false;
 		*x = (temp_x << 2) | (temp_xy & 0x03);
 		*y = (temp_y << 2) | ((temp_xy >> 2) & 0x03);
+		return true;
 	}
 	return false;
 }
