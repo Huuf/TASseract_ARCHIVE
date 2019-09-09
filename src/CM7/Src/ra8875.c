@@ -175,7 +175,7 @@ typedef enum ra8875_registers {
 
 ra8875_result ra8875_cmd_write(struct ra8875_state *state, uint8_t command);
 ra8875_result ra8875_data_write(struct ra8875_state *state, uint8_t data);
-ra8875_result ra8875_set_register(struct ra8875_state *state, uint8_t register, uint8_t data);
+ra8875_result ra8875_set_register(struct ra8875_state *state, uint8_t reg, uint8_t data);
 ra8875_result ra8875_reset(struct ra8875_state *state);
 ra8875_result ra8875_init_pll(struct ra8875_state *state);
 ra8875_result ra8875_init_lcd(struct ra8875_state *state);

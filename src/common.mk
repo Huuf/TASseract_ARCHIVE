@@ -172,11 +172,11 @@ $(C_INCLUDES_COMMON) \
 -IMiddlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
 
 # compile gcc flags
-ASFLAGS_CM4 = $(MCU_CM4) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
-ASFLAGS_CM7 = $(MCU_CM7) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+ASFLAGS_CM4 = $(MCU_CM4) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
+ASFLAGS_CM7 = $(MCU_CM7) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
 
-CFLAGS_CM4 = $(MCU_CM4) $(C_DEFS_CM4) $(C_INCLUDES_CM4) $(OPT) -Wall -fdata-sections -ffunction-sections
-CFLAGS_CM7 = $(MCU_CM7) $(C_DEFS_CM7) $(C_INCLUDES_CM7) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS_CM4 = $(MCU_CM4) $(C_DEFS_CM4) $(C_INCLUDES_CM4) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
+CFLAGS_CM7 = $(MCU_CM7) $(C_DEFS_CM7) $(C_INCLUDES_CM7) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
