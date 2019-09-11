@@ -20,6 +20,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "fatfs.h"
 #include "usb_device.h"
 #include "usbd_cdc_if.h"
 
@@ -166,6 +167,7 @@ int main(void)
 	MX_SDMMC1_SD_Init();
 	MX_SPI6_Init();
 	MX_USART1_UART_Init();
+	MX_FATFS_Init();
 	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
 	struct ra8875_state *ra8875 = NULL;
