@@ -340,7 +340,7 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
   /* Check the SD handle allocation */
   if(hsd == NULL)
   {
-    return 1;
+    return HAL_ERROR;
   }
 
   /* Check the parameters */
@@ -396,15 +396,14 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
   hsd->State = HAL_SD_STATE_BUSY;
 
   /* Initialize the Card parameters */
-  HAL_StatusTypeDef status = HAL_SD_InitCard(hsd);
-  if (status != HAL_OK)
+  if (HAL_SD_InitCard(hsd) != HAL_OK)
   {
-    return status;
+    return HAL_ERROR;
   }
 
   if( HAL_SD_GetCardStatus(hsd, &CardStatus) != HAL_OK)
   {
-    return 3;
+    return HAL_ERROR;
   }
   /* Get Initial Card Speed from Card Status*/
   speedgrade = CardStatus.UhsSpeedGrade;
@@ -428,7 +427,7 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
   /* Configure the bus wide */
   if(HAL_SD_ConfigWideBusOperation(hsd, hsd->Init.BusWide) != HAL_OK)
   {
-    return 4;
+    return HAL_ERROR;
   }
 
   /* Verify that SD card is ready to use after Initialization */
@@ -439,7 +438,7 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
     {
       hsd->ErrorCode = HAL_SD_ERROR_TIMEOUT;
       hsd->State= HAL_SD_STATE_READY;
-      return 5;
+      return HAL_ERROR;
     }
   }
 
@@ -465,7 +464,6 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
 HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
 {
   uint32_t errorstate;
-  HAL_StatusTypeDef status;
   SD_InitTypeDef Init;
   uint32_t sdmmc_clk;
 
@@ -485,17 +483,15 @@ HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
 #endif /* USE_SD_TRANSCEIVER  */
 
   /* Initialize SDMMC peripheral interface with default configuration */
-  status = SDMMC_Init(hsd->Instance, Init);
-  if(status != HAL_OK)
+  if(SDMMC_Init(hsd->Instance, Init) != HAL_OK)
   {
-    return 1;
+    return HAL_ERROR;
   }
 
   /* Set Power State to ON */
-  status = SDMMC_PowerState_ON(hsd->Instance);
-  if(status != HAL_OK)
+  if(SDMMC_PowerState_ON(hsd->Instance) != HAL_OK)
   {
-    return 2;
+    return HAL_ERROR;
   }
 
   /* wait 74 Cycles: required power up waiting time before starting
@@ -516,8 +512,8 @@ HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
   if(errorstate != HAL_SD_ERROR_NONE)
   {
     hsd->State = HAL_SD_STATE_READY;
-    hsd->ErrorCode |= errorstate | 0x100;
-    return 3;
+    hsd->ErrorCode |= errorstate;
+    return HAL_ERROR;
   }
 
   /* Card initialization */
@@ -525,8 +521,8 @@ HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
   if(errorstate != HAL_SD_ERROR_NONE)
   {
     hsd->State = HAL_SD_STATE_READY;
-    hsd->ErrorCode |= errorstate | 0x200;
-    return 4;
+    hsd->ErrorCode |= errorstate;
+    return HAL_ERROR;
   }
 
   return HAL_OK;
@@ -2973,7 +2969,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
   errorstate = SDMMC_CmdGoIdleState(hsd->Instance);
   if(errorstate != HAL_SD_ERROR_NONE)
   {
-    return errorstate | 1;
+    return errorstate;
   }
 
   /* CMD8: SEND_IF_COND: Command available only on V2.0 cards */
@@ -2985,7 +2981,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     errorstate = SDMMC_CmdGoIdleState(hsd->Instance);
     if(errorstate != HAL_SD_ERROR_NONE)
     {
-      return errorstate | 2;
+      return errorstate;
     }
 
   }
@@ -2994,15 +2990,15 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     hsd->SdCard.CardVersion = CARD_V2_X;
   }
 
-//  if( hsd->SdCard.CardVersion == CARD_V2_X)
-//  {
-//    /* SEND CMD55 APP_CMD with RCA as 0 */
-//    errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0);
-//    if(errorstate != HAL_SD_ERROR_NONE)
-//    {
-//      return HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x400000;
-//    }
-//  }
+  if( hsd->SdCard.CardVersion == CARD_V2_X)
+  {
+    /* SEND CMD55 APP_CMD with RCA as 0 */
+    errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0);
+    if(errorstate != HAL_SD_ERROR_NONE)
+    {
+      return HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x400000;
+    }
+  }
   /* SD CARD */
   /* Send ACMD41 SD_APP_OP_COND with Argument 0x80100000 */
   while((count < SDMMC_MAX_VOLT_TRIAL) && (validvoltage == 0U))
@@ -3011,7 +3007,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0);
     if(errorstate != HAL_SD_ERROR_NONE)
     {
-      return errorstate | 4;
+      return errorstate;
     }
 
     /* Send CMD41 */
@@ -3554,7 +3550,7 @@ uint32_t SD_HighSpeed(SD_HandleTypeDef *hsd)
     /* Test if the switch mode HS is ok */
     if ((((uint8_t*)SD_hs)[13] & 2U) != 2U)
     {
-      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE | 1;
+      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE;
     }
 
   }
@@ -3669,7 +3665,7 @@ static uint32_t SD_UltraHighSpeed(SD_HandleTypeDef *hsd)
     /* Test if the switch mode HS is ok */
     if ((((uint8_t*)SD_hs)[13] & 2U) != 2U)
     {
-      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE | 2;
+      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE;
     }
     else
     {
@@ -3799,7 +3795,7 @@ static uint32_t SD_DDR_Mode(SD_HandleTypeDef *hsd)
     /* Test if the switch mode  is ok */
     if ((((uint8_t*)SD_hs)[13] & 2U) != 2U)
     {
-      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE | 4;
+      errorstate = SDMMC_ERROR_UNSUPPORTED_FEATURE;
     }
     else
     {
