@@ -1,8 +1,8 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
+  * @file		   : main.c
+  * @brief		  : Main program body
   ******************************************************************************
   * @attention
   *
@@ -12,7 +12,7 @@
   * This software component is licensed by ST under Ultimate Liberty license
   * SLA0044, the "License"; You may not use this file except in compliance with
   * the License. You may obtain a copy of the License at:
-  *                             www.st.com/SLA0044
+  *							 www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -111,7 +111,7 @@ int main(void)
 	/* If we booted from a software reset, we want to force DFU mode. */
 	if(RCC->RSR & RCC_RSR_SFT1RSTF)
 	{
-		jumpToDFU();
+		//jumpToDFU();
 	}
 	/* USER CODE END 1 */
 
@@ -172,11 +172,51 @@ int main(void)
 	/* USER CODE BEGIN 2 */
 	struct ra8875_state *ra8875 = NULL;
 	initialize_ra8875(&ra8875);
+	ra8875_debug_draw(ra8875, 0, 0, "Boot.");
+	uint8_t ret;
+	ra8875_debug_draw(ra8875, 0, 0, "LinkDriver.");
+	if ((ret = BSP_SD_Init()) == MSD_OK) {
+		ra8875_debug_draw(ra8875, 0, 0, "bsp_sd_init.");
+		FATFS SD_FatFs;
+		if(f_mount(&SD_FatFs, (TCHAR const*)"/", 0) == FR_OK) {
+			ra8875_debug_draw(ra8875, 0, 0, "f_mount     ");
+			DIR directory;
+			FRESULT res;
+			res = f_opendir(&directory, "/");
+			if((res == FR_OK)) {
+				ra8875_debug_draw(ra8875, 0, 0, "f_opendir   ");
+				DIR MyDirectory;
+				FILINFO MyFileInfo;
+				res = f_findfirst(&MyDirectory, &MyFileInfo, "/", "*");
+				uint32_t files = 0;
+				while (MyFileInfo.fname[0]) {
+					if(res == FR_OK)
+					{
+						files++;
+						/* Search for next item */
+						res = f_findnext(&MyDirectory, &MyFileInfo);
+					}
+					else
+					{
+						break;
+					}
+				}
+				f_closedir(&MyDirectory);
+				char number_files[255];
+				snprintf(number_files, sizeof(number_files), "%lu", files);
+				ra8875_debug_draw(ra8875, 0, 1, number_files);
+			}
+		}
+	}
+	else {
+		char boot_error[255];
+		snprintf(boot_error, sizeof(boot_error), "BSD_SD_Init: %u %08lx", ret, hsd1.ErrorCode);
+		ra8875_debug_draw(ra8875, 0, 100, boot_error);
+	}
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	__disable_irq();
 	while (1)
 	{
 		/* USER CODE END WHILE */
@@ -204,6 +244,7 @@ void SystemClock_Config(void)
   __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
+  __HAL_RCC_PLL_PLLSOURCE_CONFIG(RCC_PLLSOURCE_HSI);
   /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
@@ -222,13 +263,13 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLFRACN = 0;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /** Initializes the CPU, AHB and APB busses clocks
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
-                              |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
+							  |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2
+							  |RCC_CLOCKTYPE_D3PCLK1|RCC_CLOCKTYPE_D1PCLK1;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.SYSCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_HCLK_DIV2;
@@ -239,19 +280,27 @@ void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_SDMMC
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_SPI6
-                              |RCC_PERIPHCLK_USB;
-  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL;
+							  |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_SPI6
+							  |RCC_PERIPHCLK_USB;
+  PeriphClkInitStruct.PLL2.PLL2M = 32;
+  PeriphClkInitStruct.PLL2.PLL2N = 100;
+  PeriphClkInitStruct.PLL2.PLL2P = 2;
+  PeriphClkInitStruct.PLL2.PLL2Q = 2;
+  PeriphClkInitStruct.PLL2.PLL2R = 16;
+  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_1;
+  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOWIDE;
+  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
+  PeriphClkInitStruct.SdmmcClockSelection = RCC_SDMMCCLKSOURCE_PLL2;
   PeriphClkInitStruct.Usart16ClockSelection = RCC_USART16CLKSOURCE_D2PCLK2;
   PeriphClkInitStruct.I2c123ClockSelection = RCC_I2C123CLKSOURCE_D2PCLK1;
   PeriphClkInitStruct.UsbClockSelection = RCC_USBCLKSOURCE_HSI48;
   PeriphClkInitStruct.Spi6ClockSelection = RCC_SPI6CLKSOURCE_D3PCLK1;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /** Enable USB Voltage detector
   */
@@ -284,19 +333,19 @@ static void MX_I2C2_Init(void)
   hi2c2.Init.NoStretchMode = I2C_NOSTRETCH_DISABLE;
   if (HAL_I2C_Init(&hi2c2) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /** Configure Analogue filter
   */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /** Configure Digital filter
   */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /* USER CODE BEGIN I2C2_Init 2 */
 
@@ -327,7 +376,7 @@ static void MX_SDMMC1_SD_Init(void)
   hsd1.Init.ClockDiv = 4;
   if (HAL_SD_Init(&hsd1) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /* USER CODE BEGIN SDMMC1_Init 2 */
 
@@ -375,7 +424,7 @@ static void MX_SPI6_Init(void)
   hspi6.Init.IOSwap = SPI_IO_SWAP_DISABLE;
   if (HAL_SPI_Init(&hspi6) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /* USER CODE BEGIN SPI6_Init 2 */
 
@@ -411,19 +460,19 @@ static void MX_USART1_UART_Init(void)
   huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
   if (HAL_UART_Init(&huart1) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   if (HAL_UARTEx_SetTxFifoThreshold(&huart1, UART_TXFIFO_THRESHOLD_1_8) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   if (HAL_UARTEx_SetRxFifoThreshold(&huart1, UART_RXFIFO_THRESHOLD_1_8) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK)
   {
-    Error_Handler();
+	Error_Handler();
   }
   /* USER CODE BEGIN USART1_Init 2 */
 
@@ -460,7 +509,7 @@ void jumpToDFU(void)
 	volatile uint32_t addr = 0x1FF09800; // address of rom base
 
 	/* Disable all interrupts */
-    __disable_irq();
+	__disable_irq();
 
 	// clear SysTick
 	SysTick->CTRL = 0;
@@ -468,14 +517,14 @@ void jumpToDFU(void)
 	SysTick->VAL = 0;
 
 	/* Set the clock to the default state */
-    HAL_RCC_DeInit();
+	HAL_RCC_DeInit();
 
-    /* Clear Interrupt Enable Register & Interrupt Pending Register */
-    for (i=0;i<5;i++)
-    {
+	/* Clear Interrupt Enable Register & Interrupt Pending Register */
+	for (i=0;i<5;i++)
+	{
 		NVIC->ICER[i]=0xFFFFFFFF;
 		NVIC->ICPR[i]=0xFFFFFFFF;
-    }
+	}
 
 	/* Re-enable all interrupts */
 	__enable_irq();
@@ -522,7 +571,7 @@ void Error_Handler(void)
 #ifdef  USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
+  *		 where the assert_param error has occurred.
   * @param  file: pointer to the source file name
   * @param  line: assert_param error line source number
   * @retval None
@@ -531,7 +580,7 @@ void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
   /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+	 tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

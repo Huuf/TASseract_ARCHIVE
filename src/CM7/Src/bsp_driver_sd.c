@@ -52,6 +52,9 @@ uint8_t BSP_SD_Init(void)
       sd_state = MSD_ERROR;
     }
   }
+  else {
+  	sd_state = sd_state * 10;
+  }
 
   return sd_state;
 }
