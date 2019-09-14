@@ -60,7 +60,7 @@ SPI_HandleTypeDef hspi6;
 UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
-
+volatile uint8_t jumpToDFU_flag;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,10 +109,10 @@ int main(void)
 {
 	/* USER CODE BEGIN 1 */
 	/* If we booted from a software reset, we want to force DFU mode. */
-	if(RCC->RSR & RCC_RSR_SFT1RSTF)
+	/*if(RCC->RSR & RCC_RSR_SFT1RSTF)
 	{
-		//jumpToDFU();
-	}
+
+	}*/
 	/* USER CODE END 1 */
 
 	/* USER CODE BEGIN Boot_Mode_Sequence_0 */
@@ -170,6 +170,8 @@ int main(void)
 	MX_FATFS_Init();
 	MX_USB_DEVICE_Init();
 	/* USER CODE BEGIN 2 */
+	jumpToDFU_flag = 0;
+
 	struct ra8875_state *ra8875 = NULL;
 	initialize_ra8875(&ra8875);
 	ra8875_debug_draw(ra8875, 0, 0, "Boot.");
@@ -221,7 +223,10 @@ int main(void)
 	{
 		/* USER CODE END WHILE */
 		/* USER CODE BEGIN 3 */
-
+		if(jumpToDFU_flag == 1)
+		{
+			jumpToDFU();
+		}
 	}
 	/* USER CODE END 3 */
 }
@@ -507,6 +512,9 @@ void jumpToDFU(void)
 	void (*SysMemBootJump)(void);
 
 	volatile uint32_t addr = 0x1FF09800; // address of rom base
+
+	// DeInit USB functionality
+	MX_USB_DEVICE_DeInit();
 
 	/* Disable all interrupts */
 	__disable_irq();
