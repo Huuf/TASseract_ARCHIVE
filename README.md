@@ -23,7 +23,7 @@ The [TASBot](http://discord.tas.bot) community
 1. Install the GNU arm toolchain from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) - latest version that ends with -sha2.exe (add path to environment variable, default unchecked, version at the time of writing is `gcc-arm-none-eabi-8-2019-q3-update-win32-sha2.exe`)
 2. Install Make for Windows from [here](http://gnuwin32.sourceforge.net/packages/make.htm), download the setup file (Complete package, except sources)
 3. Install the latest version of python3
-4. Run `python -m pip install pyserial` and then `python -m pip install _______` install any missing modules
+4. Run `python -m pip install pyserial` and then `python -m pip install _______` to install any missing modules
 ### Building
 1. Go into the src directory
 2. Run `setenv.bat`
