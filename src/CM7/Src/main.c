@@ -175,64 +175,10 @@ int main(void)
 	struct ra8875_state *ra8875 = NULL;
 	initialize_ra8875(&ra8875);
 	uint8_t ret;
+	FATFS SD_FatFs;
+	FRESULT SD_LOADED = FR_INT_ERR;
 	if ((ret = BSP_SD_Init()) == MSD_OK) {
-		FATFS SD_FatFs;
-		if(f_mount(&SD_FatFs, (TCHAR const*)"/", 0) == FR_OK) {
-			DIR directory;
-			FRESULT res;
-			res = f_opendir(&directory, "/");
-			if((res == FR_OK)) {
-				FIL file;
-				FRESULT frstatus = FR_OK;
-				if ((frstatus = f_open(&file, "test.txt", FA_CREATE_ALWAYS | FA_WRITE)) == FR_OK) {
-					UINT written = 0;
-					f_write(&file, "testing", 7, &written);
-					f_close(&file);
-					if (f_open(&file, "test.txt", FA_READ) == FR_OK) {
-						char number_files[255];
-						memset(number_files, 0, sizeof(number_files));
-						f_read(&file, number_files, 7, &written);
-						f_close(&file);
-						ra8875_debug_draw(ra8875, 0, 1, number_files);
-					}
-					else {
-						ra8875_debug_draw(ra8875, 0, 0, "f_open read");
-					}
-				}
-				else {
-					ra8875_debug_draw(ra8875, 0, 0, "f_open write");
-					switch (frstatus) {
-						case FR_DISK_ERR: ra8875_debug_draw(ra8875, 20, 0, "(1) A hard error occurred in the low level disk I/O layer"); break;
-						case FR_INT_ERR: ra8875_debug_draw(ra8875, 20, 0, "(2) Assertion failed"); break;
-						case FR_NOT_READY: ra8875_debug_draw(ra8875, 20, 0, "(3) The physical drive cannot work"); break;
-						case FR_NO_FILE: ra8875_debug_draw(ra8875, 20, 0, "(4) Could not find the file"); break;
-						case FR_NO_PATH: ra8875_debug_draw(ra8875, 20, 0, "(5) Could not find the path"); break;
-						case FR_INVALID_NAME: ra8875_debug_draw(ra8875, 20, 0, "(6) The path name format is invalid"); break;
-						case FR_DENIED: ra8875_debug_draw(ra8875, 20, 0, "(7) Access denied due to prohibited access or directory full"); break;
-						case FR_EXIST: ra8875_debug_draw(ra8875, 20, 0, "(8) Access denied due to prohibited access"); break;
-						case FR_INVALID_OBJECT: ra8875_debug_draw(ra8875, 20, 0, "(9) The file/directory object is invalid"); break;
-						case FR_WRITE_PROTECTED: ra8875_debug_draw(ra8875, 20, 0, "(10) The physical drive is write protected"); break;
-						case FR_INVALID_DRIVE: ra8875_debug_draw(ra8875, 20, 0, "(11) The logical drive number is invalid"); break;
-						case FR_NOT_ENABLED: ra8875_debug_draw(ra8875, 20, 0, "(12) The volume has no work area"); break;
-						case FR_NO_FILESYSTEM: ra8875_debug_draw(ra8875, 20, 0, "(13) There is no valid FAT volume"); break;
-						case FR_MKFS_ABORTED: ra8875_debug_draw(ra8875, 20, 0, "(14) The f_mkfs() aborted due to any problem"); break;
-						case FR_TIMEOUT: ra8875_debug_draw(ra8875, 20, 0, "(15) Could not get a grant to access the volume within defined period"); break;
-						case FR_LOCKED: ra8875_debug_draw(ra8875, 20, 0, "(16) The operation is rejected according to the file sharing policy"); break;
-						case FR_NOT_ENOUGH_CORE: ra8875_debug_draw(ra8875, 20, 0, "(17) LFN working buffer could not be allocated"); break;
-						case FR_TOO_MANY_OPEN_FILES: ra8875_debug_draw(ra8875, 20, 0, "(18) Number of open files > _FS_LOCK"); break;
-						case FR_INVALID_PARAMETER: ra8875_debug_draw(ra8875, 20, 0, "(19) Given parameter is invalid"); break;
-						default:
-							ra8875_debug_draw(ra8875, 20, 0, "Unknown."); break;
-							break;
-					}
-				}
-			}
-		}
-	}
-	else {
-		char boot_error[255];
-		snprintf(boot_error, sizeof(boot_error), "BSD_SD_Init: %u %08lx", ret, hsd1.ErrorCode);
-		ra8875_debug_draw(ra8875, 0, 100, boot_error);
+		SD_LOADED = f_mount(&SD_FatFs, (TCHAR const*)"/", 0);
 	}
 	/* USER CODE END 2 */
 
