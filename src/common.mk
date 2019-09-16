@@ -94,7 +94,9 @@ C_SOURCES_CM7 =  \
 	Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
 	Middlewares/Third_Party/FatFS/source/diskio.c \
 	Middlewares/Third_Party/FatFS/source/ff.c \
-	Middlewares/Third_Party/FatFS/source/ff_gen_drv.c
+	Middlewares/Third_Party/FatFS/source/ff_gen_drv.c \
+	Middlewares/Third_Party/FatFS/source/ffsystem.c \
+	Middlewares/Third_Party/FatFS/source/ffunicode.c
 
 # ASM sources
 ASM_SOURCES_CM4 =  \
