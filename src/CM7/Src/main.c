@@ -108,11 +108,6 @@ void setup_pin_input(GPIO_TypeDef *port, uint16_t pin, uint32_t pull)
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-	/* If we booted from a software reset, we want to force DFU mode. */
-	/*if(RCC->RSR & RCC_RSR_SFT1RSTF)
-	{
-
-	}*/
 	/* USER CODE END 1 */
 
 	/* USER CODE BEGIN Boot_Mode_Sequence_0 */
@@ -174,10 +169,9 @@ int main(void)
 
 	struct ra8875_state *ra8875 = NULL;
 	initialize_ra8875(&ra8875);
-	uint8_t ret;
 	FATFS SD_FatFs;
 	FRESULT SD_LOADED = FR_INT_ERR;
-	if ((ret = BSP_SD_Init()) == MSD_OK) {
+	if (BSP_SD_Init() == MSD_OK) {
 		SD_LOADED = f_mount(&SD_FatFs, (TCHAR const*)"/", 0);
 	}
 	/* USER CODE END 2 */
