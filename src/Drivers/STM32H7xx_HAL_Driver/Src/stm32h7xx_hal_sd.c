@@ -374,7 +374,7 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
     hsd->Write_DMADblBuf0CpltCallback = HAL_SDEx_Write_DMADoubleBuffer0CpltCallback;
     hsd->Write_DMADblBuf1CpltCallback = HAL_SDEx_Write_DMADoubleBuffer1CpltCallback;
 #if (USE_SD_TRANSCEIVER != 0U)
-    if hsd->Init.TranceiverPresent == SDMMC_TRANSCEIVER_PRESENT)
+    if (hsd->Init.TranceiverPresent == SDMMC_TRANSCEIVER_PRESENT)
     {
       hsd->DriveTransceiver_1_8V_Callback = HAL_SD_DriveTransceiver_1_8V_Callback;
     }
@@ -438,7 +438,7 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
     {
       hsd->ErrorCode = HAL_SD_ERROR_TIMEOUT;
       hsd->State= HAL_SD_STATE_READY;
-      return HAL_TIMEOUT;
+      return HAL_ERROR;
     }
   }
 
@@ -464,7 +464,6 @@ HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef *hsd)
 HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
 {
   uint32_t errorstate;
-  HAL_StatusTypeDef status;
   SD_InitTypeDef Init;
   uint32_t sdmmc_clk;
 
@@ -484,15 +483,13 @@ HAL_StatusTypeDef HAL_SD_InitCard(SD_HandleTypeDef *hsd)
 #endif /* USE_SD_TRANSCEIVER  */
 
   /* Initialize SDMMC peripheral interface with default configuration */
-  status = SDMMC_Init(hsd->Instance, Init);
-  if(status != HAL_OK)
+  if(SDMMC_Init(hsd->Instance, Init) != HAL_OK)
   {
     return HAL_ERROR;
   }
 
   /* Set Power State to ON */
-  status = SDMMC_PowerState_ON(hsd->Instance);
-  if(status != HAL_OK)
+  if(SDMMC_PowerState_ON(hsd->Instance) != HAL_OK)
   {
     return HAL_ERROR;
   }
@@ -2287,7 +2284,7 @@ HAL_StatusTypeDef HAL_SD_GetCardCSD(SD_HandleTypeDef *hsd, HAL_SD_CardCSDTypeDef
   {
     /* Clear all the static flags */
     __HAL_SD_CLEAR_FLAG(hsd, SDMMC_STATIC_FLAGS);
-    hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+    hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x1;
     hsd->State = HAL_SD_STATE_READY;
     return HAL_ERROR;
   }
@@ -2430,7 +2427,7 @@ HAL_StatusTypeDef HAL_SD_ConfigWideBusOperation(SD_HandleTypeDef *hsd, uint32_t 
   {
     if(WideMode == SDMMC_BUS_WIDE_8B)
     {
-      hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+      hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x2;
     }
     else if(WideMode == SDMMC_BUS_WIDE_4B)
     {
@@ -2453,7 +2450,7 @@ HAL_StatusTypeDef HAL_SD_ConfigWideBusOperation(SD_HandleTypeDef *hsd, uint32_t 
   else
   {
     /* MMC Card does not support this feature */
-    hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+    hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x4;
   }
 
   if(hsd->ErrorCode != HAL_SD_ERROR_NONE)
@@ -2539,7 +2536,7 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           {
             if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
             {
-              hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+              hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x8;
               status = HAL_ERROR;
             }
           }
@@ -2549,7 +2546,7 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable High Speed */
           if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x10;
             status = HAL_ERROR;
           }
         }
@@ -2567,14 +2564,14 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable UltraHigh Speed */
           if (SD_UltraHighSpeed(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x20;
             status = HAL_ERROR;
           }
           hsd->Instance->CLKCR |= SDMMC_CLKCR_BUSSPEED;
         }
         else
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x40;
           status = HAL_ERROR;
         }
         break;
@@ -2587,14 +2584,14 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable DDR Mode*/
           if (SD_DDR_Mode(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x80;
             status = HAL_ERROR;
           }
           hsd->Instance->CLKCR |=  SDMMC_CLKCR_BUSSPEED | SDMMC_CLKCR_DDR;
         }
         else
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x1000;
           status = HAL_ERROR;
         }
         break;
@@ -2608,13 +2605,13 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable High Speed */
           if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x2000;
             status = HAL_ERROR;
           }
         }
         else
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x4000;
           status = HAL_ERROR;
         }
         break;
@@ -2640,7 +2637,7 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable High Speed */
           if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x8000;
             status = HAL_ERROR;
           }
         }
@@ -2659,13 +2656,13 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
           /* Enable High Speed */
           if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
           {
-            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+            hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x10000;
             status = HAL_ERROR;
           }
         }
         else
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x20000;
           status = HAL_ERROR;
         }
         break;
@@ -2691,7 +2688,7 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
         /* Enable High Speed */
         if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x40000;
           status = HAL_ERROR;
         }
       }
@@ -2710,13 +2707,13 @@ HAL_StatusTypeDef HAL_SD_ConfigSpeedBusOperation(SD_HandleTypeDef *hsd, uint32_t
         /* Enable High Speed */
         if (SD_HighSpeed(hsd) != HAL_SD_ERROR_NONE)
         {
-          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+          hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x80000;
           status = HAL_ERROR;
         }
       }
       else
       {
-        hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+        hsd->ErrorCode |= HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x100000;
         status = HAL_ERROR;
       }
       break;
@@ -2938,7 +2935,7 @@ static uint32_t SD_InitCard(SD_HandleTypeDef *hsd)
   /* Get CSD parameters */
   if (HAL_SD_GetCardCSD(hsd, &CSD) != HAL_OK)
   {
-    return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+    return HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x200000;
   }
 
   /* Select the Card */
@@ -2999,7 +2996,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     errorstate = SDMMC_CmdAppCommand(hsd->Instance, 0);
     if(errorstate != HAL_SD_ERROR_NONE)
     {
-      return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+      return HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x400000;
     }
   }
   /* SD CARD */
@@ -3017,7 +3014,7 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
     errorstate = SDMMC_CmdAppOperCommand(hsd->Instance, SDMMC_VOLTAGE_WINDOW_SD | SDMMC_HIGH_CAPACITY | SD_SWITCH_1_8V_CAPACITY);
     if(errorstate != HAL_SD_ERROR_NONE)
     {
-      return HAL_SD_ERROR_UNSUPPORTED_FEATURE;
+      return HAL_SD_ERROR_UNSUPPORTED_FEATURE | 0x800000;
     }
 
     /* Get command response */
@@ -3037,84 +3034,6 @@ static uint32_t SD_PowerON(SD_HandleTypeDef *hsd)
   if((response & SDMMC_HIGH_CAPACITY) == SDMMC_HIGH_CAPACITY) /* (response &= SD_HIGH_CAPACITY) */
   {
     hsd->SdCard.CardType = CARD_SDHC_SDXC;
-#if (USE_SD_TRANSCEIVER != 0U)
-    if (hsd->Init.TranceiverPresent == SDMMC_TRANSCEIVER_PRESENT)
-    {
-      if((response & SD_SWITCH_1_8V_CAPACITY) == SD_SWITCH_1_8V_CAPACITY)
-      {
-        hsd->SdCard.CardSpeed = CARD_ULTRA_HIGH_SPEED;
-
-        /* Start switching procedue */
-        hsd->Instance->POWER |= SDMMC_POWER_VSWITCHEN;
-
-        /* Send CMD11 to switch 1.8V mode */
-        errorstate = SDMMC_CmdVoltageSwitch(hsd->Instance);
-        if(errorstate != HAL_SD_ERROR_NONE)
-        {
-          return errorstate;
-        }
-
-        /* Check to CKSTOP */
-        while(( hsd->Instance->STA & SDMMC_FLAG_CKSTOP) != SDMMC_FLAG_CKSTOP)
-        {
-          if((HAL_GetTick() - tickstart) >=  SDMMC_DATATIMEOUT)
-          {
-            return HAL_SD_ERROR_TIMEOUT;
-          }
-        }
-
-        /* Clear CKSTOP Flag */
-        hsd->Instance->ICR = SDMMC_FLAG_CKSTOP;
-
-        /* Check to BusyD0 */
-        if(( hsd->Instance->STA & SDMMC_FLAG_BUSYD0) != SDMMC_FLAG_BUSYD0)
-        {
-          /* Error when activate Voltage Switch in SDMMC Peripheral */
-          return SDMMC_ERROR_UNSUPPORTED_FEATURE;
-        }
-        else
-        {
-          /* Enable Transceiver Switch PIN */
-#if defined (USE_HAL_SD_REGISTER_CALLBACKS) && (USE_HAL_SD_REGISTER_CALLBACKS == 1U)
-          hsd->DriveTransceiver_1_8V_Callback(SET);
-#else
-          HAL_SD_DriveTransceiver_1_8V_Callback(SET);
-#endif /* USE_HAL_SD_REGISTER_CALLBACKS */
-
-          /* Switch ready */
-          hsd->Instance->POWER |= SDMMC_POWER_VSWITCH;
-
-          /* Check VSWEND Flag */
-          while(( hsd->Instance->STA & SDMMC_FLAG_VSWEND) != SDMMC_FLAG_VSWEND)
-          {
-            if((HAL_GetTick() - tickstart) >=  SDMMC_DATATIMEOUT)
-            {
-              return HAL_SD_ERROR_TIMEOUT;
-            }
-          }
-
-          /* Clear VSWEND Flag */
-          hsd->Instance->ICR = SDMMC_FLAG_VSWEND;
-
-          /* Check BusyD0 status */
-          if(( hsd->Instance->STA & SDMMC_FLAG_BUSYD0) == SDMMC_FLAG_BUSYD0)
-          {
-            /* Error when enabling 1.8V mode */
-            return HAL_SD_ERROR_INVALID_VOLTRANGE;
-          }
-          /* Switch to 1.8V OK */
-
-          /* Disable VSWITCH FLAG from SDMMC Peripheral */
-          hsd->Instance->POWER = 0x13U;
-
-          /* Clean Status flags */
-          hsd->Instance->ICR = 0xFFFFFFFFU;
-        }
-
-        hsd->SdCard.CardSpeed = CARD_ULTRA_HIGH_SPEED;
-      }
-    }
-#endif /* USE_SD_TRANSCEIVER  */
   }
 
   return HAL_SD_ERROR_NONE;

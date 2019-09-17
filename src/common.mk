@@ -35,64 +35,77 @@ OUT_DIR = out
 # source
 ######################################
 # C sources
-C_SOURCES_COMMON = Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c \
-Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c
+C_SOURCES_COMMON = \
+	Common/Src/system_stm32h7xx_dualcore_boot_cm4_cm7.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_cortex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_dma_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_exti.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_flash_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_gpio.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_hsem.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_i2c_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_mdma.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pcd_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_pwr_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_rcc_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_sd_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_spi_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_tim_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_hal_uart_ex.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_delayblock.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_sdmmc.c \
+	Drivers/STM32H7xx_HAL_Driver/Src/stm32h7xx_ll_usb.c
 
-C_SOURCES_CM4 =  \
-$(C_SOURCES_COMMON) \
-CM4/Src/main.c \
-CM4/Src/stm32h7xx_it.c \
-CM4/Src/stm32h7xx_hal_msp.c
+C_SOURCES_CM4 = \
+	$(C_SOURCES_COMMON) \
+	CM4/Src/main.c \
+	CM4/Src/stm32h7xx_hal_msp.c \
+	CM4/Src/stm32h7xx_it.c
 
 
 C_SOURCES_CM7 =  \
-$(C_SOURCES_COMMON) \
-CM7/Src/main.c \
-CM7/Src/usb_device.c \
-CM7/Src/ra8875.c \
-CM7/Src/usbd_conf.c \
-CM7/Src/usbd_desc.c \
-CM7/Src/usbd_cdc_if.c \
-CM7/Src/stm32h7xx_it.c \
-CM7/Src/stm32h7xx_hal_msp.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
-Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
-Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c
+	$(C_SOURCES_COMMON) \
+	CM7/Src/bsp_driver_sd.c \
+	CM7/Src/fatfs.c \
+	CM7/Src/fatfs_platform.c \
+	CM7/Src/main.c \
+	CM7/Src/ra8875.c \
+	CM7/Src/sd_diskio.c \
+	CM7/Src/stm32h7xx_hal_msp.c \
+	CM7/Src/stm32h7xx_it.c \
+	CM7/Src/usb_device.c \
+	CM7/Src/usbd_cdc_if.c \
+	CM7/Src/usbd_conf.c \
+	CM7/Src/usbd_desc.c \
+	Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Src/usbd_cdc.c \
+	Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_core.c \
+	Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ctlreq.c \
+	Middlewares/ST/STM32_USB_Device_Library/Core/Src/usbd_ioreq.c \
+	Middlewares/Third_Party/FatFS/source/diskio.c \
+	Middlewares/Third_Party/FatFS/source/ff.c \
+	Middlewares/Third_Party/FatFS/source/ff_gen_drv.c \
+	Middlewares/Third_Party/FatFS/source/ffsystem.c \
+	Middlewares/Third_Party/FatFS/source/ffunicode.c
 
 # ASM sources
 ASM_SOURCES_CM4 =  \
-startup_stm32h745xx_CM4.s
+	CM4/sleep_us_cm4.s \
+	CM4/startup_stm32h745xx_CM4.s
+
 ASM_SOURCES_CM7 =  \
-startup_stm32h745xx_CM7.s
+	CM7/sleep_us_cm7.s \
+	CM7/startup_stm32h745xx_CM7.s
 
 
 #######################################
@@ -169,14 +182,15 @@ C_INCLUDES_CM7 =  \
 $(C_INCLUDES_COMMON) \
 -ICM7/Inc \
 -IMiddlewares/ST/STM32_USB_Device_Library/Core/Inc \
--IMiddlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc
+-IMiddlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc \
+-IMiddlewares/Third_Party/FatFs/source
 
 # compile gcc flags
-ASFLAGS_CM4 = $(MCU_CM4) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
-ASFLAGS_CM7 = $(MCU_CM7) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections -ffunction-sections
+ASFLAGS_CM4 = $(MCU_CM4) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
+ASFLAGS_CM7 = $(MCU_CM7) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
 
-CFLAGS_CM4 = $(MCU_CM4) $(C_DEFS_CM4) $(C_INCLUDES_CM4) $(OPT) -Wall -fdata-sections -ffunction-sections
-CFLAGS_CM7 = $(MCU_CM7) $(C_DEFS_CM7) $(C_INCLUDES_CM7) $(OPT) -Wall -fdata-sections -ffunction-sections
+CFLAGS_CM4 = $(MCU_CM4) $(C_DEFS_CM4) $(C_INCLUDES_CM4) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
+CFLAGS_CM7 = $(MCU_CM7) $(C_DEFS_CM7) $(C_INCLUDES_CM7) $(OPT) -Wall -Wextra -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2

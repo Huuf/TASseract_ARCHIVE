@@ -72,6 +72,8 @@ void Error_Handler(void);
 #define DISP_RST_GPIO_Port GPIOC
 #define DISP_INT_Pin GPIO_PIN_1
 #define DISP_INT_GPIO_Port GPIOC
+#define DISP_CS_Pin GPIO_PIN_7
+#define DISP_CS_GPIO_Port GPIOF
 /* USER CODE BEGIN Private defines */
 void jumpToDFU(void);
 /* USER CODE END Private defines */

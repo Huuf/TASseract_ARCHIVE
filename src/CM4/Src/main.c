@@ -22,13 +22,17 @@
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
+#include <stdbool.h>
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+struct gpio_combo {
+	GPIO_TypeDef *port;
+	uint16_t pin;
+};
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -37,7 +41,6 @@
 #define HSEM_ID_0 (0U) /* HW semaphore 0*/
 
 /* USER CODE END PD */
-
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
@@ -58,6 +61,18 @@ static void MX_GPIO_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
+void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
+{
+    GPIO_InitTypeDef GPIO_InitStruct = {0};
+    HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+    GPIO_InitStruct.Pin = pin;
+    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+    HAL_GPIO_Init(port, &GPIO_InitStruct);
+    port->BSRR = (high ? pin : (pin << 16));
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -67,7 +82,6 @@ static void MX_GPIO_Init(void);
 int main(void)
 {
 	/* USER CODE BEGIN 1 */
-
 	/* USER CODE END 1 */
 
 
@@ -102,7 +116,6 @@ int main(void)
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	/* USER CODE BEGIN 2 */
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -110,7 +123,6 @@ int main(void)
 	while (1)
 	{
 		/* USER CODE END WHILE */
-
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -123,20 +135,16 @@ int main(void)
   */
 static void MX_GPIO_Init(void)
 {
-	GPIO_InitTypeDef GPIO_InitStruct = {0};
-
 	/* GPIO Ports Clock Enable */
 	__HAL_RCC_GPIOA_CLK_ENABLE();
+	__HAL_RCC_GPIOB_CLK_ENABLE();
+	__HAL_RCC_GPIOC_CLK_ENABLE();
+	__HAL_RCC_GPIOD_CLK_ENABLE();
+	__HAL_RCC_GPIOE_CLK_ENABLE();
+	__HAL_RCC_GPIOF_CLK_ENABLE();
+	__HAL_RCC_GPIOG_CLK_ENABLE();
+	__HAL_RCC_GPIOH_CLK_ENABLE();
 
-	/*Configure GPIO pin Output Level */
-	HAL_GPIO_WritePin(SNES_RESET_GPIO_Port, SNES_RESET_Pin, GPIO_PIN_RESET);
-
-	/*Configure GPIO pin : RESET */
-	GPIO_InitStruct.Pin = SNES_RESET_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
-	HAL_GPIO_Init(SNES_RESET_GPIO_Port, &GPIO_InitStruct);
 
 }
 

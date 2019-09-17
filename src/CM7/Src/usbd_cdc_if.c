@@ -32,7 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+extern volatile uint8_t jumpToDFU_flag;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -180,6 +180,9 @@ static int8_t CDC_DeInit_FS(void)
   * @param  length: Number of data to be sent (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
+static uint8_t lineCoding[7] // <------- add these three lines
+// 115200bps, 1stop, no parity, 8bit
+= {0x00, 0xC2, 0x01, 0x00, 0x00, 0x00, 0x08};
 static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
 {
   /* USER CODE BEGIN 5 */
@@ -223,11 +226,11 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   /* 6      | bDataBits  |   1   | Number Data bits (5, 6, 7, 8 or 16).          */
   /*******************************************************************************/
     case CDC_SET_LINE_CODING:
-
+    memcpy( lineCoding, pbuf, MIN(sizeof(lineCoding), length) );
     break;
 
     case CDC_GET_LINE_CODING:
-
+    memcpy( pbuf, lineCoding, MIN(sizeof(lineCoding), length) );
     break;
 
     case CDC_SET_CONTROL_LINE_STATE:
@@ -260,13 +263,25 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   * @param  Len: Number of data received (in bytes)
   * @retval Result of the operation: USBD_OK if all operations are OK else USBD_FAIL
   */
-static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
+static int8_t CDC_Receive_FS(uint8_t* Buf, __attribute__((unused)) uint32_t *Len)
 {
-  /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  return (USBD_OK);
-  /* USER CODE END 6 */
+	/* USER CODE BEGIN 6 */
+	for(uint32_t byteNum = 0;byteNum < *Len;byteNum++)
+	{
+		switch(Buf[byteNum])
+		{
+			case '\xDF':
+				jumpToDFU_flag = 1;
+				break;
+			default:
+				break;
+		}
+	}
+
+	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+	return (USBD_OK);
+	/* USER CODE END 6 */
 }
 
 /**

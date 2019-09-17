@@ -1,0 +1,1 @@
+set PATH=%ProgramFiles%\GnuWin32\bin\;%ProgramFiles%\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin;%ProgramFiles(x86)%\GnuWin32\bin\;%ProgramFiles(x86)%\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin;%PATH%
