@@ -32,7 +32,7 @@
 
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
-
+extern volatile uint8_t jumpToDFU_flag;
 /* USER CODE END PV */
 
 /** @addtogroup STM32_USB_OTG_DEVICE_LIBRARY
@@ -265,11 +265,23 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length)
   */
 static int8_t CDC_Receive_FS(uint8_t* Buf, __attribute__((unused)) uint32_t *Len)
 {
-  /* USER CODE BEGIN 6 */
-  USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
-  USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  return (USBD_OK);
-  /* USER CODE END 6 */
+	/* USER CODE BEGIN 6 */
+	for(uint32_t byteNum = 0;byteNum < *Len;byteNum++)
+	{
+		switch(Buf[byteNum])
+		{
+			case '\xDF':
+				jumpToDFU_flag = 1;
+				break;
+			default:
+				break;
+		}
+	}
+
+	USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);
+	USBD_CDC_ReceivePacket(&hUsbDeviceFS);
+	return (USBD_OK);
+	/* USER CODE END 6 */
 }
 
 /**

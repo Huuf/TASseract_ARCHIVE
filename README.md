@@ -22,9 +22,15 @@ The [TASBot](http://discord.tas.bot) community
 ### Setting Up
 1. Install the GNU arm toolchain from [here](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) - latest version that ends with -sha2.exe (add path to environment variable, default unchecked, version at the time of writing is `gcc-arm-none-eabi-8-2019-q3-update-win32-sha2.exe`)
 2. Install Make for Windows from [here](http://gnuwin32.sourceforge.net/packages/make.htm), download the setup file (Complete package, except sources)
+3. Install the latest version of python3
+4. Run `python -m pip install pyserial` and then `python -m pip install _______` to install any missing modules
 ### Building
 1. Go into the src directory
-2. Run `make` from this directory (Default path is `C:\Program Files (x86)\GnuWin32\bin`, doesn't get added to path by default, and if you have multiple build enviornments, it's not recommended to do so).
+2. Run `setenv.bat`
+3. Run `makeall.bat` to compile
+### Flashing the firmware
+1. Run `python dfu.py` to put the device in DFU mode (if it is not already)
+2. Run `flashall.bat` to flash the compiled firmware
 
 # PCB
 The PCB is made in the free software [CircuitMaker](https://circuitmaker.com/) and can be found here: [Development PCB](https://circuitmaker.com/Projects/Details/Hans-Anders-3/TAStm32H745ZIT6).
@@ -35,7 +41,7 @@ The case is made in the free for certain parties software [Fusion 360](http://fu
 # Source Code
 This project is written in C with some ASM.
 
-The source code is available in the src directory. In here you will find code generated using [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and then modified according to the needs of the project.
+The source code is available in the src directory. In here you will find code generated using [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and then modified according to the needs of the project. Note that the .ioc file may not be consistent with the latest version of the source code.
 
 # Duh
 If I had a Duh moment (forgot credits, stuff like that), you can contact me on [Discord](http://discord.tas.bot) and @Skippy#5840
