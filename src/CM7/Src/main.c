@@ -519,6 +519,7 @@ void initialize_ra8875(struct ra8875_state **ra8875)
 		ra8875_gpiox(*ra8875, true);
 		ra8875_pwm1_setup(*ra8875, true, 0x0A);
 		ra8875_pwm1_duty_cycle(*ra8875, 0xFF);
+		ra8875_draw_boot_logo(*ra8875);
 	}
 }
 /* USER CODE END 4 */

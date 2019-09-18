@@ -240,6 +240,59 @@ ra8875_result ra8875_pwm1_duty_cycle(struct ra8875_state *ra8875, uint8_t cycle)
 	return ra8875_set_register(ra8875, RA8875_REG_P1DCR, cycle);
 }
 
+void ra8875_draw_boot_logo(struct ra8875_state *ra8875)
+{
+	const uint16_t background_color = 0xFFFF;
+	const uint16_t logo_color = 0x0000;
+
+	//Background;
+	ra8875_draw_rectangle(ra8875, 0, 0, 800, 480, background_color, false);
+
+	//Basic shape, where we will sustract triangles from
+	const int x_base = 800 / 2 - (328 / 2);
+	const int y_base = 50;
+	//Hexagon Shape
+	ra8875_draw_triangle(ra8875, x_base + 0, y_base + 95, x_base + 164, y_base + 0, x_base + 0, y_base + 285, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 164, y_base + 0, x_base + 329, y_base + 95, x_base + 329, y_base + 285, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 0, y_base + 285, x_base + 329, y_base + 285, x_base + 164, y_base + 380, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 164, y_base + 0, x_base + 0, y_base + 285, x_base + 329, y_base + 285, logo_color, false);
+
+	//Left Top triangle
+	ra8875_draw_triangle(ra8875, x_base + 23, y_base + 100, x_base + 157, y_base + 22, x_base + 157, y_base + 177, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 88, y_base + 137, x_base + 157, y_base + 97, x_base + 157, y_base + 177, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 146, x_base + 157, y_base + 115, x_base + 157, y_base + 177, background_color, false);
+
+	//Right Top triangle
+	ra8875_draw_triangle(ra8875, x_base + 306, y_base + 100, x_base + 172, y_base + 22, x_base + 172, y_base + 177, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 241, y_base + 137, x_base + 172, y_base + 97, x_base + 172, y_base + 177, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 225, y_base + 146, x_base + 172, y_base + 115, x_base + 172, y_base + 177, background_color, false);
+
+	//Right triangle
+	ra8875_draw_triangle(ra8875, x_base + 313, y_base + 113, x_base + 313, y_base + 267, x_base + 180, y_base + 190, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 248, y_base + 150, x_base + 248, y_base + 230, x_base + 180, y_base + 190, logo_color, false);
+
+	//Left triangle
+	ra8875_draw_triangle(ra8875, x_base + 15, y_base + 113, x_base + 15, y_base + 267, x_base + 149, y_base + 190, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 81, y_base + 150, x_base + 81, y_base + 230, x_base + 149, y_base + 190, logo_color, false);
+
+	//Right bottom triangle
+	ra8875_draw_triangle(ra8875, x_base + 306, y_base + 280, x_base + 180, y_base + 353, x_base + 180, y_base + 208, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 241, y_base + 243, x_base + 180, y_base + 278, x_base + 180, y_base + 208, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 225, y_base + 234, x_base + 180, y_base + 260, x_base + 180, y_base + 208, background_color, false);
+
+	//Left Bottom triangle
+	ra8875_draw_triangle(ra8875, x_base + 23, y_base + 280, x_base + 149, y_base + 353, x_base + 149, y_base + 208, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 88, y_base + 243, x_base + 149, y_base + 278, x_base + 149, y_base + 208, logo_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 234, x_base + 149, y_base + 260, x_base + 149, y_base + 208, background_color, false);
+
+	//Top Center triangles
+	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 146, x_base + 225, y_base + 146, x_base + 164, y_base + 111, background_color, false);
+	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 146, x_base + 225, y_base + 146, x_base + 164, y_base + 181, background_color, false);
+
+
+
+}
+
 void ra8875_set_graphics_mode(struct ra8875_state *ra8875)
 {
 	uint8_t cur_value = 0;
@@ -289,6 +342,32 @@ void ra8875_draw_line(struct ra8875_state *ra8875, int16_t x1, int16_t y1, int16
 
 
 	ra8875_set_register(ra8875, RA8875_REG_DCR, 0x80);
+
+	ra8875_wait_for_register_flag(ra8875, RA8875_REG_DCR, 0x80);
+}
+
+void ra8875_draw_triangle(struct ra8875_state *ra8875, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color, bool outline)
+{
+	ra8875_set_register(ra8875, RA8875_REG_DLHSR0, (x1 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DLHSR1, (x1 >> 8) & 0xFF);
+	ra8875_set_register(ra8875, RA8875_REG_DLVSR0, (y1 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DLVSR1, (y1 >> 8) & 0xFF);
+
+	ra8875_set_register(ra8875, RA8875_REG_DLHER0, (x2 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DLHER1, (x2 >> 8) & 0xFF);
+	ra8875_set_register(ra8875, RA8875_REG_DLVER0, (y2 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DLVER1, (y2 >> 8) & 0xFF);
+
+	ra8875_set_register(ra8875, RA8875_REG_DTPH0, (x3 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DTPH1, (x3 >> 8) & 0xFF);
+	ra8875_set_register(ra8875, RA8875_REG_DTPV0, (y3 & 0xFF));
+	ra8875_set_register(ra8875, RA8875_REG_DTPV1, (y3 >> 8) & 0xFF);
+
+	ra8875_set_register(ra8875, RA8875_REG_FGCR0, ((color & 0xf800) >> 11) & 0xFF);
+	ra8875_set_register(ra8875, RA8875_REG_FGCR1, ((color & 0x07e0) >> 5) & 0xFF);
+	ra8875_set_register(ra8875, RA8875_REG_FGCR2, ((color & 0x001f) & 0xff));
+
+	ra8875_set_register(ra8875, RA8875_REG_DCR, outline ? 0x81 : 0xA1);
 
 	ra8875_wait_for_register_flag(ra8875, RA8875_REG_DCR, 0x80);
 }
