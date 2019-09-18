@@ -26,10 +26,12 @@ ra8875_result ra8875_turn_on_display(struct ra8875_state *ra8875, bool on);
 ra8875_result ra8875_gpiox(struct ra8875_state *ra8875, bool state);
 ra8875_result ra8875_pwm1_setup(struct ra8875_state *ra8875, bool on, uint8_t divider);
 ra8875_result ra8875_pwm1_duty_cycle(struct ra8875_state *ra8875, uint8_t cycle);
+void ra8875_draw_boot_logo(struct ra8875_state *ra8875);
 
 void ra8875_set_graphics_mode(struct ra8875_state *ra8875);
 void ra8875_draw_rectangle(struct ra8875_state *ra8875, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color, bool outline);
 void ra8875_draw_line(struct ra8875_state *ra8875, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+void ra8875_draw_triangle(struct ra8875_state *ra8875, int16_t x1, int16_t y1, int16_t x2, int16_t y2, int16_t x3, int16_t y3, uint16_t color, bool outline);
 void ra8875_set_text_mode(struct ra8875_state *ra8875);
 void ra8875_set_text_cursor(struct ra8875_state *ra8875, uint16_t x, uint16_t y);
 void ra8875_set_text_color(struct ra8875_state *ra8875, uint16_t foreground, uint16_t background);
