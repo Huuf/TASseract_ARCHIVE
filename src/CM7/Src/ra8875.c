@@ -248,7 +248,6 @@ void ra8875_draw_boot_logo(struct ra8875_state *ra8875)
 	//Background;
 	ra8875_draw_rectangle(ra8875, 0, 0, 800, 480, background_color, false);
 
-	//Basic shape, where we will sustract triangles from
 	const int x_base = 800 / 2 - (328 / 2);
 	const int y_base = 50;
 	//Hexagon Shape
@@ -288,9 +287,6 @@ void ra8875_draw_boot_logo(struct ra8875_state *ra8875)
 	//Top Center triangles
 	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 146, x_base + 225, y_base + 146, x_base + 164, y_base + 111, background_color, false);
 	ra8875_draw_triangle(ra8875, x_base + 104, y_base + 146, x_base + 225, y_base + 146, x_base + 164, y_base + 181, background_color, false);
-
-
-
 }
 
 void ra8875_set_graphics_mode(struct ra8875_state *ra8875)
