@@ -5,7 +5,7 @@ It got a better name!
 If you want to get the most reliable version, check the releases, any other links can be in development and non working (currently no design is verified working yet).
 
 ## Overview
-This project aims to create an easy-to-use, multi-system TAS replay device to be used on actual consoles. The name of this project comes from the fact that it is powered by a [STM32H745ZIT6](https://www.st.com/en/microcontrollers-microprocessors/stm32h745zi.html) microcontroller.
+This project aims to create an easy-to-use, multi-system TAS replay device to be used on actual consoles. The name of this project comes from the words TAS and tesseract, it is powered by a [STM32H745ZIT6](https://www.st.com/en/microcontrollers-microprocessors/stm32h745zi.html) microcontroller.
 
 # Thanks
 [Ownasaurus](https://github.com/Ownasaurus) for having done the [TAStm32](https://github.com/Ownasaurus/TAStm32)
