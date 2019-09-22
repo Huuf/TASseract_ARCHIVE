@@ -77,30 +77,57 @@ bool nes_controller_setup(struct nes_controller **controller_ptr, nes_controller
 
 void setup_to_console(struct nes_controller *controller)
 {
-
+	setup_pin_input(controller->VCC_PORT, controller->VCC_PIN, GPIO_NOPULL);
+	setup_pin_input(controller->CLK_PORT, controller->CLK_PIN, GPIO_NOPULL);
+	setup_pin_input(controller->OUT_PORT, controller->OUT_PIN, GPIO_NOPULL);
+	setup_pin_output(controller->D0_PORT, controller->D0_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->D3_PORT, controller->D3_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->D4_PORT, controller->D4_PIN, GPIO_PULLUP, true, true);
 }
 
 void setup_to_visualisation(struct nes_controller *controller)
 {
-
+	setup_pin_input(controller->VCC_PORT, controller->VCC_PIN, GPIO_NOPULL);
+	setup_pin_output(controller->CLK_PORT, controller->CLK_PIN, GPIO_NOPULL, true, true);
+	setup_pin_output(controller->OUT_PORT, controller->OUT_PIN, GPIO_NOPULL, true, true);
+	setup_pin_output(controller->D0_PORT, controller->D0_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->D3_PORT, controller->D3_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->D4_PORT, controller->D4_PIN, GPIO_PULLUP, true, true);
 }
 
 void setup_to_controller(struct nes_controller *controller)
 {
-
+	setup_pin_input(controller->VCC_PORT, controller->VCC_PIN, GPIO_NOPULL);
+	setup_pin_output(controller->CLK_PORT, controller->CLK_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->OUT_PORT, controller->OUT_PIN, GPIO_PULLUP, true, true);
+	setup_pin_input(controller->D0_PORT, controller->D0_PIN, GPIO_NOPULL);
+	setup_pin_input(controller->D3_PORT, controller->D3_PIN, GPIO_NOPULL);
+	setup_pin_input(controller->D4_PORT, controller->D4_PIN, GPIO_NOPULL);
 }
 
-void setup_pin_input(GPIO_TypeDef *port, uint16_t pin, bool pullUp)
-{
-}
-
-void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, bool high)
+void setup_pin_input(GPIO_TypeDef *port, uint16_t pin, uint32_t pull)
 {
 	GPIO_InitTypeDef GPIO_InitStruct = {0};
 	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
 	GPIO_InitStruct.Pin = pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+	GPIO_InitStruct.Pull = pull;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 	HAL_GPIO_Init(SNES_RESET_GPIO_Port, &GPIO_InitStruct);
+	port->BSRR = pin << 16;
+}
+
+void setup_pin_output(GPIO_TypeDef *port, uint16_t pin, uint32_t pull, bool open_drain, bool high)
+{
+	GPIO_InitTypeDef GPIO_InitStruct = {0};
+	HAL_GPIO_WritePin(port, pin, GPIO_PIN_RESET);
+	GPIO_InitStruct.Pin = pin;
+	GPIO_InitStruct.Mode = open_drain ? GPIO_MODE_OUTPUT_OD : GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = pull;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+	HAL_GPIO_Init(SNES_RESET_GPIO_Port, &GPIO_InitStruct);
+	if (high)
+		port->BSRR = pin;
+	else
+		port->BSRR = pin << 16;
 }
