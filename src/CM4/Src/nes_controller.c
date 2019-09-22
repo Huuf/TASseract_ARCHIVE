@@ -90,9 +90,9 @@ void setup_to_visualisation(struct nes_controller *controller)
 	setup_pin_input(controller->VCC_PORT, controller->VCC_PIN, GPIO_NOPULL);
 	setup_pin_output(controller->CLK_PORT, controller->CLK_PIN, GPIO_NOPULL, true, true);
 	setup_pin_output(controller->OUT_PORT, controller->OUT_PIN, GPIO_NOPULL, true, true);
-	setup_pin_output(controller->D0_PORT, controller->D0_PIN, GPIO_PULLUP, true, true);
-	setup_pin_output(controller->D3_PORT, controller->D3_PIN, GPIO_PULLUP, true, true);
-	setup_pin_output(controller->D4_PORT, controller->D4_PIN, GPIO_PULLUP, true, true);
+	setup_pin_output(controller->D0_PORT, controller->D0_PIN, GPIO_NOPULL, true, true);
+	setup_pin_output(controller->D3_PORT, controller->D3_PIN, GPIO_NOPULL, true, true);
+	setup_pin_output(controller->D4_PORT, controller->D4_PIN, GPIO_NOPULL, true, true);
 }
 
 void setup_to_controller(struct nes_controller *controller)
