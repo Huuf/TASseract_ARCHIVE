@@ -70,6 +70,7 @@ C_SOURCES_COMMON = \
 C_SOURCES_CM4 = \
 	$(C_SOURCES_COMMON) \
 	CM4/Src/main.c \
+	CM4/Src/nes_controller.c \
 	CM4/Src/stm32h7xx_hal_msp.c \
 	CM4/Src/stm32h7xx_it.c
 
