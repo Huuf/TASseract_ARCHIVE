@@ -5,7 +5,7 @@ It got a better name!
 If you want to get the most reliable version, check the releases, any other links can be in development and non working (currently no design is verified working yet).
 
 ## Overview
-This project aims to create an easy-to-use, multi-system TAS replay device to be used on actual consoles. The name of this project comes from the fact that it is powered by a [STM32H745ZIT6](https://www.st.com/en/microcontrollers-microprocessors/stm32h745zi.html) microcontroller.
+This project aims to create an easy-to-use, multi-system TAS replay device to be used on actual consoles. The name of this project comes from the words TAS and tesseract, it is powered by a [STM32H745ZIT6](https://www.st.com/en/microcontrollers-microprocessors/stm32h745zi.html) microcontroller.
 
 # Thanks
 [Ownasaurus](https://github.com/Ownasaurus) for having done the [TAStm32](https://github.com/Ownasaurus/TAStm32)
@@ -41,7 +41,7 @@ The case is made in the free for certain parties software [Fusion 360](http://fu
 # Source Code
 This project is written in C with some ASM.
 
-The source code is available in the src directory. In here you will find code generated using [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and then modified according to the needs of the project. Note that the .ioc file may not be consistent with the latest version of the source code.
+The source code is available in the src directory. In here you will find code generated using [STM32CubeMX](https://www.st.com/en/development-tools/stm32cubemx.html) and then modified according to the needs of the project. Note that the .ioc file may not be used to generate the actual files directly, since the makefile generation is currently broken in STM32CubeMX.
 
 # Duh
 If I had a Duh moment (forgot credits, stuff like that), you can contact me on [Discord](http://discord.tas.bot) and @Skippy#5840
